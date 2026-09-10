@@ -87,12 +87,12 @@ class _TrackingScreenState extends State<TrackingScreen>
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
               color: AppConstants.cardBg,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 8,
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -293,7 +293,7 @@ class _TrackingScreenState extends State<TrackingScreen>
             decoration: BoxDecoration(
               color: AppConstants.cardBg,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
@@ -395,13 +395,13 @@ class _TrackingScreenState extends State<TrackingScreen>
       decoration: BoxDecoration(
         color: isCurrent
             ? AppConstants.clinicalNavy.withOpacity(0.08)
-            : (isPassed ? AppConstants.statusNominal.withOpacity(0.08) : Colors.white),
-        borderRadius: BorderRadius.circular(8),
+            : (isPassed ? AppConstants.statusNominal.withOpacity(0.08) : AppConstants.surfacePorcelain),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isCurrent
               ? AppConstants.clinicalNavy
-              : (isPassed ? AppConstants.statusNominal : AppConstants.dividerSubtle),
-          width: isCurrent ? 1.5 : 1.0,
+              : (isPassed ? AppConstants.statusNominal : AppConstants.cardBorder),
+          width: isCurrent ? 1.5 : 1.2,
         ),
       ),
       child: Column(

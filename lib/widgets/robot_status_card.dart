@@ -22,20 +22,20 @@ class RobotStatusCard extends StatelessWidget {
 
     return InkWell(
       onTap: onTapDetails,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppConstants.cardBg,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isOffline ? AppConstants.crimsonDanger : AppConstants.cardBorder,
-            width: isOffline ? 1.5 : 1.0,
+            width: isOffline ? 1.5 : 1.2,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 8,
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
@@ -256,11 +256,11 @@ class RobotStatusCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: AppConstants.surfacePorcelain,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: AppConstants.cardBorder),
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppConstants.cardBorder, width: 1.2),
         ),
         title: Row(
           children: const [

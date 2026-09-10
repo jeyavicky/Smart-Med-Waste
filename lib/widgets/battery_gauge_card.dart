@@ -19,15 +19,15 @@ class BatteryGaugeCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppConstants.cardBg,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isWarning ? AppConstants.amberWarning : AppConstants.cardBorder,
-          width: 1.0,
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],

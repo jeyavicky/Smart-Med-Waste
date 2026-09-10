@@ -2,155 +2,160 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_constants.dart';
 
-/// Enterprise Clinical Typography and Healthcare Material 3 Theme System
-/// WCAG 2.1 AA Compliant with Certified Inter Typography
+/// Modern Nordic Health-Tech Palette & Material 3 Theme System
+/// Sage, Muted Slate & Soft Frost clinical design system
 class AppTheme {
-  static ThemeData get lightTheme {
-    final baseTextTheme = ThemeData.light().textTheme;
-    final clinicalTextTheme = GoogleFonts.interTextTheme(baseTextTheme).copyWith(
-      // Screen & App Bar Titles
+  // Core Nordic Palette Tokens
+  static const Color scaffoldBg = Color(0xFFF0F4F8); // Soft Ice Grey / Frost Canvas
+  static const Color surfaceCard = Color(0xFFE6ECEF); // Soft Mint Surface Tint
+  static const Color surfacePorcelain = Color(0xFFEBF1F5); // Muted Porcelain
+  static const Color pearlWhite = Color(0xFFF7FAFC); // Clean Pearl White
+  static const Color primaryTeal = Color(0xFF0A4D52); // Deep Forest Teal
+  static const Color accentTeal = Color(0xFF1B7A82); // Nordic Cyan
+  static const Color sageEmerald = Color(0xFF2E856E); // Soft Emerald / Sage
+  static const Color borderSubtle = Color(0xFFD2DCE5); // Subtle Deep Slate Accent (1.2px)
+  static const Color textMain = Color(0xFF16252D); // Graphite Dark Slate
+  static const Color textMuted = Color(0xFF4F6470); // Deep Steel Grey
+
+  static ThemeData get nordicClinicalTheme {
+    final baseText = ThemeData.light().textTheme;
+    final typography = GoogleFonts.interTextTheme(baseText).copyWith(
       headlineMedium: GoogleFonts.inter(
         fontSize: 22,
         fontWeight: FontWeight.w700,
-        color: const Color(0xFF0F172A),
+        color: textMain,
         letterSpacing: -0.3,
       ),
-      // Card Headers & Section Titles
       titleMedium: GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: const Color(0xFF1E293B),
+        color: textMain,
       ),
-      // Form Input & Regular Body Text
       bodyMedium: GoogleFonts.inter(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: const Color(0xFF334155),
+        color: textMain,
       ),
-      // Small Details & Microcopy
       bodySmall: GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.w500,
-        color: const Color(0xFF64748B),
+        color: textMuted,
       ),
-      // Badges, Stat Labels & Section Headers
       labelSmall: GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.w600,
-        letterSpacing: 0.8,
-        color: const Color(0xFF64748B),
+        letterSpacing: 0.6,
+        color: textMuted,
       ),
-      // Extended Clinical Scale
+      // Extended typography hierarchy
       titleLarge: GoogleFonts.inter(
         fontSize: 18,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.2,
-        color: const Color(0xFF0F2942),
+        color: primaryTeal,
       ),
       titleSmall: GoogleFonts.inter(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: const Color(0xFF1E293B),
+        color: textMain,
       ),
       bodyLarge: GoogleFonts.inter(
         fontSize: 15,
         fontWeight: FontWeight.w500,
-        color: const Color(0xFF1E293B),
+        color: textMain,
       ),
       labelLarge: GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.w600,
-        letterSpacing: 0.9,
-        color: const Color(0xFF0F2942),
+        letterSpacing: 0.8,
+        color: primaryTeal,
       ),
       labelMedium: GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.w600,
-        letterSpacing: 0.8,
-        color: const Color(0xFF64748B),
+        letterSpacing: 0.6,
+        color: textMuted,
       ),
       displayLarge: GoogleFonts.inter(
         fontSize: 32,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
-        color: const Color(0xFF0F172A),
+        color: textMain,
       ),
       displayMedium: GoogleFonts.inter(
         fontSize: 26,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
-        color: const Color(0xFF0F172A),
+        color: textMain,
       ),
       displaySmall: GoogleFonts.inter(
         fontSize: 22,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
-        color: const Color(0xFF0F172A),
+        color: textMain,
       ),
     );
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      textTheme: clinicalTextTheme,
-      primaryTextTheme: clinicalTextTheme,
+      scaffoldBackgroundColor: scaffoldBg,
+      cardColor: surfaceCard,
+      textTheme: typography,
+      primaryTextTheme: typography,
       fontFamily: GoogleFonts.inter().fontFamily,
-      scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF0F2942),
-        brightness: Brightness.light,
-      ).copyWith(
-        primary: AppConstants.clinicalNavy,
+      primaryColor: primaryTeal,
+      colorScheme: const ColorScheme.light(
+        surface: surfaceCard,
+        onSurface: textMain,
+        primary: primaryTeal,
         onPrimary: Colors.white,
-        secondary: AppConstants.medicalTeal,
+        secondary: accentTeal,
         onSecondary: Colors.white,
-        surface: AppConstants.cardBg,
-        onSurface: const Color(0xFF0F172A),
-        error: AppConstants.crimsonDanger,
+        error: Color(0xFFC53030),
         onError: Colors.white,
-        outline: AppConstants.cardBorder,
-        surfaceContainerHighest: AppConstants.surfaceInteractive,
+        outline: borderSubtle,
+        surfaceContainerHighest: surfacePorcelain,
       ),
-      primaryColor: const Color(0xFF0F2942),
-      dividerColor: AppConstants.dividerSubtle,
+      dividerColor: borderSubtle,
       dividerTheme: const DividerThemeData(
-        color: AppConstants.cardBorder,
-        thickness: 1.0,
-        space: 1.0,
+        color: borderSubtle,
+        thickness: 1.2,
+        space: 1.2,
       ),
       cardTheme: CardThemeData(
-        color: AppConstants.cardBg,
+        color: surfaceCard,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: AppConstants.cardBorder, width: 1.0),
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: borderSubtle, width: 1.2),
         ),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppConstants.cardBg,
-        foregroundColor: AppConstants.clinicalNavy,
+        backgroundColor: scaffoldBg,
+        foregroundColor: primaryTeal,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: GoogleFonts.inter(
-          color: AppConstants.clinicalNavy,
+          color: primaryTeal,
           fontSize: 18,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.2,
         ),
-        iconTheme: const IconThemeData(color: AppConstants.clinicalNavy),
-        actionsIconTheme: const IconThemeData(color: AppConstants.clinicalNavy),
+        iconTheme: const IconThemeData(color: primaryTeal),
+        actionsIconTheme: const IconThemeData(color: primaryTeal),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppConstants.clinicalNavy,
+          backgroundColor: primaryTeal,
           foregroundColor: Colors.white,
           elevation: 0,
-          minimumSize: const Size(0, 48),
+          minimumSize: const Size(0, 50),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 13,
@@ -161,14 +166,14 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: AppConstants.clinicalNavy,
+          backgroundColor: surfaceCard,
+          foregroundColor: primaryTeal,
           elevation: 0,
-          minimumSize: const Size(0, 48),
-          side: const BorderSide(color: AppConstants.clinicalNavy, width: 1.5),
+          minimumSize: const Size(0, 50),
+          side: const BorderSide(color: accentTeal, width: 1.0),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 13,
@@ -179,7 +184,7 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppConstants.clinicalNavy,
+          foregroundColor: primaryTeal,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           textStyle: GoogleFonts.inter(
             fontSize: 12,
@@ -189,61 +194,69 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        fillColor: surfacePorcelain,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         hintStyle: GoogleFonts.inter(
-          color: const Color(0xFF64748B),
+          color: textMuted,
           fontSize: 13,
           fontWeight: FontWeight.w400,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppConstants.dividerSubtle, width: 1.0),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderSubtle, width: 1.2),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppConstants.dividerSubtle, width: 1.0),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderSubtle, width: 1.2),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-          borderSide: BorderSide(color: AppConstants.clinicalNavy, width: 1.5),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          borderSide: BorderSide(color: primaryTeal, width: 1.5),
         ),
         errorBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-          borderSide: BorderSide(color: AppConstants.crimsonDanger, width: 1.0),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          borderSide: BorderSide(color: Color(0xFFC53030), width: 1.2),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white,
+        backgroundColor: surfaceCard,
         elevation: 0,
-        indicatorColor: AppConstants.clinicalNavy.withOpacity(0.08),
+        indicatorColor: accentTeal.withOpacity(0.12),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: AppConstants.clinicalNavy);
+            return const IconThemeData(color: primaryTeal);
           }
-          return const IconThemeData(color: AppConstants.coolSlate);
+          return const IconThemeData(color: textMuted);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: AppConstants.clinicalNavy,
+              color: primaryTeal,
             );
           }
           return GoogleFonts.inter(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: AppConstants.coolSlate,
+            color: textMuted,
           );
         }),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: surfaceCard,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+        ),
       ),
     );
   }
 
-  // Certified high-contrast clinical light surface applies to darkTheme as well
+  // Alias getters to support lightTheme and darkTheme across all modules
+  static ThemeData get lightTheme => nordicClinicalTheme;
   static ThemeData get darkTheme => lightTheme;
 }
 
-/// Alias for backwards compatibility with any existing clinical imports
+/// Alias for backwards compatibility
 typedef SoftClinicalTheme = AppTheme;

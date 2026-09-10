@@ -69,12 +69,12 @@ class WasteScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const AiDetectionScreen()),
               );
             },
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: AppConstants.clinicalNavy,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.04),
@@ -359,11 +359,11 @@ class WasteScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: AppConstants.surfacePorcelain,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: AppConstants.cardBorder),
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppConstants.cardBorder, width: 1.2),
         ),
         title: Row(
           children: [

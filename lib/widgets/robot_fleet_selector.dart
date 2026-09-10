@@ -16,12 +16,12 @@ class RobotFleetSelector extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppConstants.cardBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppConstants.cardBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -100,7 +100,7 @@ class RobotFleetSelector extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 8),
                   child: InkWell(
                     onTap: () => robotProvider.selectRobot(bot.id),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 150),
                       width: 148,
@@ -108,13 +108,13 @@ class RobotFleetSelector extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppConstants.clinicalNavy
-                            : AppConstants.surfaceInteractive,
-                        borderRadius: BorderRadius.circular(8),
+                            : AppConstants.surfacePorcelain,
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: isSelected
                               ? AppConstants.clinicalNavy
-                              : AppConstants.dividerSubtle,
-                          width: 1.0,
+                              : AppConstants.cardBorder,
+                          width: 1.2,
                         ),
                       ),
                       child: Column(

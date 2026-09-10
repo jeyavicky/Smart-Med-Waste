@@ -234,11 +234,11 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isEmergency ? AppConstants.crimsonDangerLight : AppConstants.surfaceInteractive,
-        borderRadius: BorderRadius.circular(10),
+        color: isEmergency ? AppConstants.crimsonDangerLight : AppConstants.surfacePorcelain,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: color,
-          width: 1.0,
+          width: 1.2,
         ),
       ),
       child: Row(
@@ -364,16 +364,16 @@ class DashboardScreen extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(10),
       child: Container(
         height: 52,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: isPrimary ? AppConstants.clinicalNavy : Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          color: isPrimary ? AppConstants.clinicalNavy : AppConstants.cardBg,
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isPrimary ? AppConstants.clinicalNavy : AppConstants.cardBorder,
-            width: isPrimary ? 1.0 : 1.0,
+            color: isPrimary ? AppConstants.clinicalNavy : AppConstants.medicalTeal,
+            width: 1.0,
           ),
           boxShadow: [
             BoxShadow(
@@ -418,12 +418,12 @@ class DashboardScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppConstants.cardBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppConstants.cardBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],

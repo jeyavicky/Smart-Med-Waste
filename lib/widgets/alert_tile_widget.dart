@@ -19,12 +19,12 @@ class AlertTileWidget extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppConstants.cardBg,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: alert.isAcknowledged
               ? AppConstants.cardBorder
               : alert.level.color.withOpacity(0.5),
-          width: alert.isAcknowledged ? 1.0 : 1.5,
+          width: alert.isAcknowledged ? 1.2 : 1.5,
         ),
         boxShadow: [
           BoxShadow(

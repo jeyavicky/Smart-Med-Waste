@@ -144,17 +144,17 @@ class CompartmentBarWidget extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: lightBgColor,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isWarning
                 ? AppConstants.amberWarning
                 : badgeColor.withOpacity(0.40),
-            width: isWarning ? 1.5 : 1.0,
+            width: isWarning ? 1.5 : 1.2,
           ),
           boxShadow: [
             BoxShadow(
@@ -173,10 +173,11 @@ class CompartmentBarWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppConstants.elevatedContainer,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: badgeColor.withOpacity(0.35),
+                      width: 1.0,
                     ),
                   ),
                   child: Icon(
@@ -317,7 +318,7 @@ class CompartmentBarWidget extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: fillRatio,
                 minHeight: 8.0,
-                backgroundColor: Colors.white,
+                backgroundColor: AppConstants.surfacePorcelain,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   isWarning ? AppConstants.amberWarning : badgeColor,
                 ),

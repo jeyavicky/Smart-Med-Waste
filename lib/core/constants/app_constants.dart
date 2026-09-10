@@ -8,72 +8,77 @@ class AppConstants {
   static const String appTagline = 'Autonomous Biomedical Waste Segregation';
   static const String appVersion = 'v1.4.2-SIH26115';
 
-  // 1. Color Architecture (High-Contrast, Light Clinical Surface)
-  static const Color canvasBg = Color(0xFFF8FAFC); // Clean Medical Neutral (Slate 50)
-  static const Color cardBg = Color(0xFFFFFFFF); // Pure Crisp White surface
-  static const Color cardBorder = Color(0xFFE2E8F0); // Subtle 1px clinical surface border
-  static const Color surfaceInteractive = Color(0xFFF1F5F9); // Slate 100 elevated/interactive
-  static const Color clinicalNavy = Color(0xFF0F2942); // Primary / Authority Brand
-  static const Color medicalTeal = Color(0xFF0D9488); // Secondary Clinical Teal
-  static const Color coolSlate = Color(0xFF64748B); // Secondary Cool Slate
-  static const Color dividerSubtle = Color(0xFFCBD5E1); // Subtle / Dividers
+  // 1. Modern Nordic Health-Tech Palette (Sage, Muted Slate & Soft Frost)
+  static const Color canvasBg = Color(0xFFF0F4F8); // Soft Ice Grey / Frost Canvas
+  static const Color cardBg = Color(0xFFE6ECEF); // Soft Mint Surface Tint
+  static const Color surfacePorcelain = Color(0xFFEBF1F5); // Muted Porcelain
+  static const Color elevatedContainer = Color(0xFFF7FAFC); // Clean Pearl White
+  static const Color cardBorder = Color(0xFFD2DCE5); // Subtle Deep Slate Accent (1.2px)
+  static const Color surfaceInteractive = Color(0xFFEBF1F5); // Interactive porcelain surface
+  static const Color primaryBrand = Color(0xFF0A4D52); // Deep Forest Teal
+  static const Color secondaryInteractive = Color(0xFF1B7A82); // Nordic Cyan
+  static const Color accentAction = Color(0xFF2E856E); // Soft Emerald / Sage
+  static const Color clinicalNavy = Color(0xFF0A4D52); // Primary Brand Alias
+  static const Color medicalTeal = Color(0xFF1B7A82); // Secondary Nordic Cyan Alias
+  static const Color coolSlate = Color(0xFF4F6470); // Deep Steel Grey
+  static const Color dividerSubtle = Color(0xFFD2DCE5); // Subtle Borders & Dividers
 
-  // Text Contrast
-  static const Color textPrimary = Color(0xFF0F172A); // Deep Charcoal (critical data & headers)
-  static const Color textSecondary = Color(0xFF475569); // Neutral Muted (metadata, subtitles, labels)
-  static const Color textBody = Color(0xFF1E293B); // Slate 800 Card Titles & Metric Labels
-  static const Color textMuted = Color(0xFF94A3B8); // Slate 400 helper text
+  // Text Contrast (Graphite Dark Slate & Deep Steel Grey)
+  static const Color textPrimary = Color(0xFF16252D); // Graphite Dark Slate (headers & primary data)
+  static const Color textSecondary = Color(0xFF4F6470); // Deep Steel Grey (subtitles, metadata, labels)
+  static const Color textBody = Color(0xFF16252D); // Dark Slate Body
+  static const Color textMuted = Color(0xFF4F6470); // Deep Steel Grey Muted
 
   // Verification & Status Accents
-  static const Color statusNominal = Color(0xFF059669); // Green verification ticks / healthy
-  static const Color amberWarning = Color(0xFFD97706); // Caution / fill >80%
-  static const Color crimsonDanger = Color(0xFFDC2626); // Biohazard / E-Stop
-  static const Color crimsonDangerLight = Color(0xFFFEF2F2); // Subtle red background
+  static const Color statusNominal = Color(0xFF2E856E); // Soft Emerald / Sage verification ticks
+  static const Color amberWarning = Color(0xFFB7791F); // Caution / fill >80%
+  static const Color crimsonDanger = Color(0xFFC53030); // Biohazard / E-Stop
+  static const Color crimsonDangerLight = Color(0xFFFFE8E6); // Soft red background
 
   // Compatibility / Support Aliases
-  static const Color darkSlate = Color(0xFF0F172A);
-  static const Color surfaceSlate = Color(0xFFFFFFFF); // Redirect to crisp white
-  static const Color borderSlate = Color(0xFFE2E8F0); // Redirect to crisp border
-  static const Color tealPrimary = Color(0xFF0F2942); // Primary authority navy
-  static const Color tealAccent = Color(0xFF0D9488); // Clinical teal
-  static const Color neutralGrey = Color(0xFF64748B);
-  static const Color lightSlate = Color(0xFF475569);
+  static const Color darkSlate = Color(0xFF16252D);
+  static const Color surfaceSlate = Color(0xFFE6ECEF);
+  static const Color borderSlate = Color(0xFFD2DCE5);
+  static const Color tealPrimary = Color(0xFF0A4D52);
+  static const Color tealAccent = Color(0xFF1B7A82);
+  static const Color neutralGrey = Color(0xFF4F6470);
+  static const Color lightSlate = Color(0xFF4F6470);
 
-  // 2. Standardized 5-Stream Biomedical Waste Palette (CPCB Standard)
-  // 1. Sharps / Blades (Translucent/White stream)
-  static const Color sharpsLightBg = Color(0xFFF1F5F9);
-  static const Color sharpsBadge = Color(0xFF475569);
-  static const Color sharpsColor = Color(0xFF475569);
-  static const Color sharpsAccent = Color(0xFF475569);
+  // 2. Standard 5-Bin Compartment Harmony (Softened Clinical Contrast)
+  // 1. Sharps / Blades: Card #E8EDF2 | Accent/Badge #37474F
+  static const Color sharpsLightBg = Color(0xFFE8EDF2);
+  static const Color sharpsBadge = Color(0xFF37474F);
+  static const Color sharpsColor = Color(0xFF37474F);
+  static const Color sharpsAccent = Color(0xFF37474F);
   static const String sharpsLabel = 'SHARPS / BLADES';
 
-  // 2. Infectious / Pathological (Yellow stream)
-  static const Color infectiousLightBg = Color(0xFFFEF3C7);
-  static const Color infectiousBadge = Color(0xFFD97706);
-  static const Color infectiousColor = Color(0xFFD97706);
-  static const Color infectiousBg = Color(0xFFFEF3C7);
+  // 2. Infectious / Pathological: Card #FFF3CD | Accent/Badge #B7791F
+  static const Color infectiousLightBg = Color(0xFFFFF3CD);
+  static const Color infectiousBadge = Color(0xFFB7791F);
+  static const Color infectiousColor = Color(0xFFB7791F);
+  static const Color infectiousBg = Color(0xFFFFF3CD);
   static const String infectiousLabel = 'INFECTIOUS / PATHOLOGICAL';
 
-  // 3. Contaminated Plastics / Recyclables (Red stream)
-  static const Color plasticLightBg = Color(0xFFFEE2E2);
-  static const Color plasticBadge = Color(0xFFDC2626);
-  static const Color plasticColor = Color(0xFFDC2626);
-  static const Color plasticBg = Color(0xFFFEE2E2);
+  // 3. Contaminated Plastics / Recyclables: Card #FFE8E6 | Accent/Badge #C53030
+  static const Color plasticLightBg = Color(0xFFFFE8E6);
+  static const Color plasticBadge = Color(0xFFC53030);
+  static const Color plasticColor = Color(0xFFC53030);
+  static const Color plasticBg = Color(0xFFFFE8E6);
   static const String plasticLabel = 'CONTAMINATED PLASTICS';
 
-  // 4. Glassware & Vials / Cytotoxic (Blue stream)
-  static const Color glasswareLightBg = Color(0xFFDBEAFE);
-  static const Color glasswareBadge = Color(0xFF2563EB);
-  static const Color glasswareColor = Color(0xFF2563EB);
-  static const Color glasswareBg = Color(0xFFDBEAFE);
-  static const Color otherColor = Color(0xFF2563EB);
+  // 4. Glassware & Vials: Card #E1EEFF | Accent/Badge #2B6CB0
+  static const Color glasswareLightBg = Color(0xFFE1EEFF);
+  static const Color glasswareBadge = Color(0xFF2B6CB0);
+  static const Color glasswareColor = Color(0xFF2B6CB0);
+  static const Color glasswareBg = Color(0xFFE1EEFF);
+  static const Color otherColor = Color(0xFF2B6CB0);
   static const String glasswareLabel = 'GLASSWARE & VIALS';
 
-  // 5. General / Unclassified (Unknown / Others stream)
-  static const Color unknownLightBg = Color(0xFFF3E8FF);
-  static const Color unknownBadge = Color(0xFF7E22CE);
-  static const Color unknownColor = Color(0xFF7E22CE);
-  static const Color unknownBg = Color(0xFFF3E8FF);
+  // 5. Unknown / Others: Card #EFE7FA | Accent/Badge #6B46C1
+  static const Color unknownLightBg = Color(0xFFEFE7FA);
+  static const Color unknownBadge = Color(0xFF6B46C1);
+  static const Color unknownColor = Color(0xFF6B46C1);
+  static const Color unknownBg = Color(0xFFEFE7FA);
   static const String unknownLabel = 'GENERAL / UNCLASSIFIED';
 
   // Thresholds

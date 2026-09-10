@@ -66,8 +66,8 @@ class _RequestCollectionSheetState extends State<RequestCollectionSheet> {
     return Container(
       decoration: BoxDecoration(
         color: AppConstants.cardBg,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+        border: Border.all(color: AppConstants.cardBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),

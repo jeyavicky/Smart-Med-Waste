@@ -156,8 +156,8 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppConstants.cardBg,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                border: Border.all(color: AppConstants.cardBorder, width: 1.2),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.04),
@@ -290,9 +290,9 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppConstants.surfaceInteractive,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppConstants.cardBorder),
+                        color: AppConstants.surfacePorcelain,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppConstants.cardBorder, width: 1.2),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

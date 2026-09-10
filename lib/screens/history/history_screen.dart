@@ -204,13 +204,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return InkWell(
       onTap: () => _showAuditDetailsDialog(context, item),
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppConstants.cardBg,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppConstants.cardBorder, width: 1.2),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.02),
@@ -387,11 +387,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: AppConstants.surfacePorcelain,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: AppConstants.cardBorder),
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppConstants.cardBorder, width: 1.2),
         ),
         title: Row(
           children: [

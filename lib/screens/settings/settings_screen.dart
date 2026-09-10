@@ -56,10 +56,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+                color: AppConstants.cardBorder,
+                width: 1.2,
               ),
             ),
             child: Row(
@@ -112,10 +113,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(18),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+                color: AppConstants.cardBorder,
+                width: 1.2,
               ),
             ),
             child: Column(
@@ -184,10 +186,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(18),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+                color: AppConstants.cardBorder,
+                width: 1.2,
               ),
             ),
             child: Column(
@@ -265,10 +268,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(18),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+                color: AppConstants.cardBorder,
+                width: 1.2,
               ),
             ),
             child: Column(
