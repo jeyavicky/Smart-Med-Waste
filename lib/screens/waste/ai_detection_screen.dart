@@ -31,6 +31,7 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
     final wasteProvider = context.watch<WasteAnalyticsProvider>();
     final currentItem = wasteProvider.currentItem;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isUnknownFallback = currentItem.category == WasteCategory.unknownOthers || currentItem.confidence < 0.70;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -50,7 +51,7 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
             const SizedBox(width: 8),
             const Text(
               'LIVE AI VISION SCANNER (ONBOARD)',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 0.5, color: Colors.white),
             ),
           ],
         ),
@@ -153,29 +154,65 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
             child: Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: isDark ? AppConstants.surfaceSlate : const Color(0xFFF8FAFC),
+                color: isDark ? AppConstants.surfaceSlate : Colors.white,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 border: Border.all(
-                  color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+                  color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withOpacity(0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Fallback Alert Notice if Low-Confidence / Unknown
+                    if (isUnknownFallback) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppConstants.unknownLightBg,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppConstants.unknownBadge.withOpacity(0.4)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.shield_rounded, size: 16, color: AppConstants.unknownBadge),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'ANTI-CONTAMINATION: Low confidence (<70%) or unclassified item automatically routed to Gate #5 (Unknown/Others Fallback)',
+                                style: const TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppConstants.unknownBadge,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
                     // Item Detection Classification Header
                     Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: currentItem.category.color.withOpacity(0.2),
+                            color: currentItem.category.lightBgColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: currentItem.category.color),
+                            border: Border.all(color: currentItem.category.badgeColor),
                           ),
                           child: Icon(
                             currentItem.category.icon,
-                            color: currentItem.category.color,
+                            color: currentItem.category.badgeColor,
                             size: 24,
                           ),
                         ),
@@ -186,9 +223,10 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                             children: [
                               Text(
                                 currentItem.detectedObject,
-                                style: const TextStyle(
-                                  fontSize: 16,
+                                style: TextStyle(
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w800,
+                                  color: isDark ? Colors.white : AppConstants.clinicalNavy,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -197,23 +235,23 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                                   Text(
                                     currentItem.category.displayName,
                                     style: TextStyle(
-                                      color: currentItem.category.accentColor,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
+                                      color: currentItem.category.badgeColor,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 11,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: currentItem.category.color.withOpacity(0.15),
+                                      color: currentItem.category.badgeColor.withOpacity(0.12),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       '${(currentItem.confidence * 100).toStringAsFixed(1)}% Confidence',
                                       style: TextStyle(
-                                        color: currentItem.category.accentColor,
-                                        fontSize: 11,
+                                        color: currentItem.category.badgeColor,
+                                        fontSize: 10.5,
                                         fontWeight: FontWeight.w800,
                                       ),
                                     ),
@@ -228,31 +266,32 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                           children: [
                             Text(
                               Formatters.formatWeight(currentItem.weightKg),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -0.5,
+                                color: isDark ? Colors.white : AppConstants.clinicalNavy,
                               ),
                             ),
-                            const Text(
+                            Text(
                               'Load Cell Mass',
-                              style: TextStyle(fontSize: 11, color: AppConstants.neutralGrey),
+                              style: TextStyle(fontSize: 11, color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary),
                             ),
                           ],
                         ),
                       ],
                     ),
 
-                    const Divider(height: 24),
+                    const Divider(height: 20),
 
                     // Target Compartment & Protocol Details
                     Container(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF131D31) : const Color(0xFFF1F5F9),
+                        color: isDark ? const Color(0xFF131D31) : AppConstants.surfaceInteractive,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isDark ? AppConstants.borderSlate : const Color(0xFFCBD5E1),
+                          color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
                         ),
                       ),
                       child: Column(
@@ -260,38 +299,39 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.swap_calls_rounded, size: 18, color: AppConstants.tealAccent),
+                              Icon(Icons.swap_calls_rounded, size: 18, color: currentItem.category.badgeColor),
                               const SizedBox(width: 8),
                               Text(
                                 'TARGET: ${currentItem.category.compartmentGateId.toUpperCase()}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w800,
-                                  fontSize: 12,
-                                  color: AppConstants.tealAccent,
+                                  fontSize: 11.5,
+                                  color: currentItem.category.badgeColor,
                                   letterSpacing: 0.5,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Text(
                             'Actuator Directives: ${currentItem.internalActionDetails}',
                             style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                              fontSize: 11.5,
+                              color: isDark ? AppConstants.lightSlate : AppConstants.textPrimary,
+                              height: 1.3,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Row(
                             children: [
-                              const Icon(Icons.fingerprint_rounded, size: 14, color: AppConstants.neutralGrey),
+                              const Icon(Icons.fingerprint_rounded, size: 14, color: AppConstants.textSecondary),
                               const SizedBox(width: 4),
                               Text(
-                                'Ledger Proof Hash: ${currentItem.verificationHash ?? "0x0000000000000000"}',
+                                'CPCB Blockchain Hash: ${currentItem.verificationHash ?? "0x0000000000000000"}',
                                 style: const TextStyle(
                                   fontSize: 10,
                                   fontFamily: 'Courier',
-                                  color: AppConstants.neutralGrey,
+                                  color: AppConstants.textSecondary,
                                 ),
                               ),
                             ],
@@ -300,7 +340,7 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Action Buttons: Manual Override & Simulated Trigger
                     Row(
@@ -308,8 +348,8 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: _triggerSimulatedScan,
-                            icon: const Icon(Icons.skip_next_rounded),
-                            label: const Text('SAMPLE NEXT ITEM'),
+                            icon: const Icon(Icons.skip_next_rounded, size: 16),
+                            label: const Text('SAMPLE NEXT ITEM', style: TextStyle(fontSize: 11.5)),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -323,12 +363,12 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                                     '${currentItem.detectedObject} deposited to ${currentItem.category.shortName} compartment & logged to ledger.',
                                   ),
                                   behavior: SnackBarBehavior.floating,
-                                  backgroundColor: AppConstants.tealPrimary,
+                                  backgroundColor: AppConstants.clinicalNavy,
                                 ),
                               );
                             },
-                            icon: const Icon(Icons.check_circle_rounded),
-                            label: const Text('CONFIRM & DIVERT'),
+                            icon: const Icon(Icons.check_circle_rounded, size: 16),
+                            label: const Text('CONFIRM & DIVERT', style: TextStyle(fontSize: 11.5)),
                           ),
                         ),
                       ],

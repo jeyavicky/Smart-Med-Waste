@@ -274,15 +274,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Display & Accessibility',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                    color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                  ),
                 ),
                 const SizedBox(height: 10),
 
                 SwitchListTile(
-                  title: const Text('Dark Mode (Clinical High-Contrast HUD)'),
-                  subtitle: const Text('Optimal for low-light ICU environments', style: TextStyle(fontSize: 11)),
+                  title: Text(
+                    'Night Shift HUD (Low-Light Mode)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                    ),
+                  ),
+                  subtitle: const Text(
+                    'Default: Clean Medical Light Mode (Accessible Clinical)',
+                    style: TextStyle(fontSize: 11, color: AppConstants.textSecondary),
+                  ),
+                  activeColor: AppConstants.medicalTeal,
                   value: themeProvider.isDarkMode,
                   contentPadding: EdgeInsets.zero,
                   onChanged: (_) => themeProvider.toggleTheme(),

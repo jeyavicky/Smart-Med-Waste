@@ -2,88 +2,111 @@ import 'package:flutter/material.dart';
 import '../core/constants/app_constants.dart';
 
 enum WasteCategory {
-  sharpsWhite,
-  infectiousYellow,
-  plasticRed,
-  otherBlue,
+  sharps,
+  infectious,
+  plastic,
+  glassware,
+  unknownOthers;
+
+  // Backward-compatibility aliases
+  static const WasteCategory sharpsWhite = WasteCategory.sharps;
+  static const WasteCategory infectiousYellow = WasteCategory.infectious;
+  static const WasteCategory plasticRed = WasteCategory.plastic;
+  static const WasteCategory otherBlue = WasteCategory.glassware;
 }
 
 extension WasteCategoryExtension on WasteCategory {
   String get displayName {
     switch (this) {
-      case WasteCategory.sharpsWhite:
-        return 'SHARPS / WHITE';
-      case WasteCategory.infectiousYellow:
-        return 'INFECTIOUS / YELLOW';
-      case WasteCategory.plasticRed:
-        return 'PLASTIC / RED';
-      case WasteCategory.otherBlue:
-        return 'OTHER / BLUE';
+      case WasteCategory.sharps:
+        return 'SHARPS (NEEDLES & BLADES)';
+      case WasteCategory.infectious:
+        return 'INFECTIOUS BIOHAZARD';
+      case WasteCategory.plastic:
+        return 'PLASTIC / RECYCLABLE';
+      case WasteCategory.glassware:
+        return 'GLASSWARE / CYTOTOXIC';
+      case WasteCategory.unknownOthers:
+        return 'UNKNOWN / OTHERS (FALLBACK)';
     }
   }
 
   String get shortName {
     switch (this) {
-      case WasteCategory.sharpsWhite:
+      case WasteCategory.sharps:
         return 'Sharps';
-      case WasteCategory.infectiousYellow:
+      case WasteCategory.infectious:
         return 'Infectious';
-      case WasteCategory.plasticRed:
+      case WasteCategory.plastic:
         return 'Plastic';
-      case WasteCategory.otherBlue:
-        return 'Other';
+      case WasteCategory.glassware:
+        return 'Glassware';
+      case WasteCategory.unknownOthers:
+        return 'Unknown/Other';
     }
   }
 
   String get compartmentGateId {
     switch (this) {
-      case WasteCategory.sharpsWhite:
-        return 'Gate #1 (Sharps Sealed)';
-      case WasteCategory.infectiousYellow:
+      case WasteCategory.sharps:
+        return 'Gate #1 (Sharps Vault)';
+      case WasteCategory.infectious:
         return 'Gate #2 (Biohazard Bio-Lock)';
-      case WasteCategory.plasticRed:
+      case WasteCategory.plastic:
         return 'Gate #3 (Plastic Diverter)';
-      case WasteCategory.otherBlue:
-        return 'Gate #4 (General Glass/Other)';
+      case WasteCategory.glassware:
+        return 'Gate #4 (Glassware Chute)';
+      case WasteCategory.unknownOthers:
+        return 'Gate #5 (Fallback Containment)';
     }
   }
 
   Color get color {
     switch (this) {
-      case WasteCategory.sharpsWhite:
-        return AppConstants.sharpsColor;
-      case WasteCategory.infectiousYellow:
-        return AppConstants.infectiousColor;
-      case WasteCategory.plasticRed:
-        return AppConstants.plasticColor;
-      case WasteCategory.otherBlue:
-        return AppConstants.otherColor;
+      case WasteCategory.sharps:
+        return AppConstants.sharpsBadge;
+      case WasteCategory.infectious:
+        return AppConstants.infectiousBadge;
+      case WasteCategory.plastic:
+        return AppConstants.plasticBadge;
+      case WasteCategory.glassware:
+        return AppConstants.glasswareBadge;
+      case WasteCategory.unknownOthers:
+        return AppConstants.unknownBadge;
     }
   }
 
-  Color get accentColor {
+  Color get lightBgColor {
     switch (this) {
-      case WasteCategory.sharpsWhite:
-        return AppConstants.sharpsAccent;
-      case WasteCategory.infectiousYellow:
-        return const Color(0xFFFDE047);
-      case WasteCategory.plasticRed:
-        return const Color(0xFFF87171);
-      case WasteCategory.otherBlue:
-        return const Color(0xFF60A5FA);
+      case WasteCategory.sharps:
+        return AppConstants.sharpsLightBg;
+      case WasteCategory.infectious:
+        return AppConstants.infectiousLightBg;
+      case WasteCategory.plastic:
+        return AppConstants.plasticLightBg;
+      case WasteCategory.glassware:
+        return AppConstants.glasswareLightBg;
+      case WasteCategory.unknownOthers:
+        return AppConstants.unknownLightBg;
     }
   }
+
+  Color get badgeColor => color;
+
+  Color get accentColor => color;
 
   IconData get icon {
     switch (this) {
-      case WasteCategory.sharpsWhite:
+      case WasteCategory.sharps:
         return Icons.content_cut_rounded;
-      case WasteCategory.infectiousYellow:
+      case WasteCategory.infectious:
         return Icons.biotech_rounded;
-      case WasteCategory.plasticRed:
+      case WasteCategory.plastic:
         return Icons.local_hospital_rounded;
-      case WasteCategory.otherBlue:
-        return Icons.recycling_rounded;
+      case WasteCategory.glassware:
+        return Icons.medication_rounded;
+      case WasteCategory.unknownOthers:
+        return Icons.help_outline_rounded;
     }
   }
 }

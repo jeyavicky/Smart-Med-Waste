@@ -19,6 +19,7 @@ class RobotStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isOffline = robot.status == RobotStatus.offline;
 
     return InkWell(
       onTap: onTapDetails,
@@ -29,32 +30,32 @@ class RobotStatusCard extends StatelessWidget {
           color: isDark ? AppConstants.surfaceSlate : Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: robot.status == RobotStatus.emergencyStop
+            color: isOffline
                 ? AppConstants.crimsonDanger
-                : (isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0)),
-            width: robot.status == RobotStatus.emergencyStop ? 2.0 : 1.0,
+                : (isDark ? AppConstants.borderSlate : AppConstants.cardBorder),
+            width: isOffline ? 2.0 : 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: (robot.status == RobotStatus.emergencyStop
+              color: (isOffline
                       ? AppConstants.crimsonDanger
-                      : AppConstants.tealPrimary)
-                  .withOpacity(isDark ? 0.12 : 0.06),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
+                      : const Color(0xFF0F172A))
+                  .withOpacity(isDark ? 0.2 : 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Robot Name + Online Indicator + Status Badge
+            // Top Row: Robot Avatar + Name + Assigned Ward + Status Badge
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: robot.status.statusColor.withOpacity(0.15),
+                    color: robot.status.statusColor.withOpacity(0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -73,15 +74,15 @@ class RobotStatusCard extends StatelessWidget {
                           Flexible(
                             child: Text(
                               robot.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
                                 fontSize: 15,
+                                color: isDark ? Colors.white : AppConstants.clinicalNavy,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 6),
-                          // Pulsing online dot
                           Container(
                             width: 8,
                             height: 8,
@@ -96,10 +97,10 @@ class RobotStatusCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'ID: ${robot.id} • ${robot.currentWard}',
+                        'ID: ${robot.id} • ${robot.assignedWard}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                          color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -110,7 +111,7 @@ class RobotStatusCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: robot.status.statusColor.withOpacity(0.15),
+                    color: robot.status.statusColor.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: robot.status.statusColor.withOpacity(0.4),
@@ -120,7 +121,7 @@ class RobotStatusCard extends StatelessWidget {
                     robot.status.displayName,
                     style: TextStyle(
                       color: robot.status.statusColor,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       fontSize: 10,
                       letterSpacing: 0.5,
                     ),
@@ -133,7 +134,7 @@ class RobotStatusCard extends StatelessWidget {
             const Divider(),
             const SizedBox(height: 12),
 
-            // Battery + Telemetry stats row
+            // Battery + Subsystem Telemetry Row
             Row(
               children: [
                 // Battery metric
@@ -144,20 +145,21 @@ class RobotStatusCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            robot.batteryPercent > 20
+                            robot.batteryLevel > 20
                                 ? Icons.battery_charging_full_rounded
                                 : Icons.battery_alert_rounded,
                             size: 16,
-                            color: robot.batteryPercent > 20
-                                ? AppConstants.tealAccent
+                            color: robot.batteryLevel > 20
+                                ? AppConstants.medicalTeal
                                 : AppConstants.crimsonDanger,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             Formatters.formatBattery(robot.batteryPercent),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
                               fontSize: 14,
+                              color: isDark ? Colors.white : AppConstants.clinicalNavy,
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -165,7 +167,7 @@ class RobotStatusCard extends StatelessWidget {
                             '(${Formatters.formatRuntimeEstimate(robot.batteryPercent)})',
                             style: TextStyle(
                               fontSize: 11,
-                              color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                              color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                             ),
                           ),
                         ],
@@ -178,10 +180,10 @@ class RobotStatusCard extends StatelessWidget {
                           minHeight: 5,
                           backgroundColor: isDark
                               ? const Color(0xFF334155)
-                              : const Color(0xFFE2E8F0),
+                              : AppConstants.cardBorder,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            robot.batteryPercent > 20
-                                ? AppConstants.tealAccent
+                            robot.batteryLevel > 20
+                                ? AppConstants.medicalTeal
                                 : AppConstants.crimsonDanger,
                           ),
                         ),
@@ -191,7 +193,7 @@ class RobotStatusCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
 
-                // Subsystems green check badge
+                // Subsystems OK badge
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
@@ -215,7 +217,7 @@ class RobotStatusCard extends StatelessWidget {
                         style: TextStyle(
                           color: Color(0xFF10B981),
                           fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -225,7 +227,7 @@ class RobotStatusCard extends StatelessWidget {
                 const SizedBox(width: 8),
 
                 // E-Stop / Action Button
-                if (robot.status == RobotStatus.emergencyStop)
+                if (robot.status == RobotStatus.offline)
                   ElevatedButton(
                     onPressed: () => robotProvider.resumeOperations(),
                     style: ElevatedButton.styleFrom(
@@ -233,7 +235,7 @@ class RobotStatusCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       minimumSize: const Size(0, 32),
                     ),
-                    child: const Text('RESUME', style: TextStyle(fontSize: 11)),
+                    child: const Text('RESUME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                   )
                 else
                   IconButton(
@@ -255,21 +257,30 @@ class RobotStatusCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppConstants.surfaceSlate,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: AppConstants.cardBorder),
+        ),
         title: Row(
           children: const [
             Icon(Icons.warning_amber_rounded, color: AppConstants.crimsonDanger),
             SizedBox(width: 8),
-            Text('Trigger E-STOP?'),
+            Text(
+              'Trigger AMR E-STOP?',
+              style: TextStyle(fontWeight: FontWeight.w800, color: AppConstants.clinicalNavy),
+            ),
           ],
         ),
-        content: const Text(
-          'This will immediately cut motor power, lock all waste diverter gates, and notify hospital safety officers.',
+        content: Text(
+          'This will immediately halt drive motors on ${robot.name} (${robot.id}), seal all 5 internal chambers, and broadcast an alert to Central Waste Command.',
+          style: const TextStyle(color: AppConstants.textPrimary, fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL'),
+            child: const Text('CANCEL', style: TextStyle(color: AppConstants.textSecondary, fontWeight: FontWeight.w700)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -279,7 +290,7 @@ class RobotStatusCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.crimsonDanger,
             ),
-            child: const Text('STOP ROBOT NOW'),
+            child: const Text('STOP ROBOT NOW', style: TextStyle(fontWeight: FontWeight.w800)),
           ),
         ],
       ),

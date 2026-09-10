@@ -3,11 +3,18 @@ import '../core/constants/app_constants.dart';
 
 enum RobotStatus {
   idle,
-  navigatingToWard,
-  segregatingWaste,
-  returningToDisposal,
-  dockedCharging,
-  emergencyStop,
+  enRoute,
+  collecting,
+  discharging,
+  docked,
+  offline;
+
+  // Backward compatibility aliases
+  static const RobotStatus navigatingToWard = RobotStatus.enRoute;
+  static const RobotStatus segregatingWaste = RobotStatus.collecting;
+  static const RobotStatus returningToDisposal = RobotStatus.discharging;
+  static const RobotStatus dockedCharging = RobotStatus.docked;
+  static const RobotStatus emergencyStop = RobotStatus.offline;
 }
 
 extension RobotStatusExtension on RobotStatus {
@@ -15,32 +22,32 @@ extension RobotStatusExtension on RobotStatus {
     switch (this) {
       case RobotStatus.idle:
         return 'IDLE / STANDBY';
-      case RobotStatus.navigatingToWard:
-        return 'NAVIGATING TO WARD';
-      case RobotStatus.segregatingWaste:
-        return 'SEGREGATING WASTE';
-      case RobotStatus.returningToDisposal:
-        return 'RETURNING TO CENTRAL DISPOSAL';
-      case RobotStatus.dockedCharging:
+      case RobotStatus.enRoute:
+        return 'TRANSIT / EN ROUTE';
+      case RobotStatus.collecting:
+        return 'COLLECTING WASTE';
+      case RobotStatus.discharging:
+        return 'DISCHARGING AT BAY';
+      case RobotStatus.docked:
         return 'DOCKED & CHARGING';
-      case RobotStatus.emergencyStop:
-        return 'EMERGENCY STOP (ACTIVE)';
+      case RobotStatus.offline:
+        return 'OFFLINE / E-STOP';
     }
   }
 
   Color get statusColor {
     switch (this) {
       case RobotStatus.idle:
-        return AppConstants.lightSlate;
-      case RobotStatus.navigatingToWard:
-        return AppConstants.tealAccent;
-      case RobotStatus.segregatingWaste:
+        return AppConstants.textSecondary;
+      case RobotStatus.enRoute:
+        return AppConstants.medicalTeal;
+      case RobotStatus.collecting:
         return AppConstants.amberWarning;
-      case RobotStatus.returningToDisposal:
-        return AppConstants.otherColor;
-      case RobotStatus.dockedCharging:
+      case RobotStatus.discharging:
+        return const Color(0xFF2563EB);
+      case RobotStatus.docked:
         return const Color(0xFF10B981);
-      case RobotStatus.emergencyStop:
+      case RobotStatus.offline:
         return AppConstants.crimsonDanger;
     }
   }
@@ -49,17 +56,64 @@ extension RobotStatusExtension on RobotStatus {
     switch (this) {
       case RobotStatus.idle:
         return Icons.pause_circle_outline;
-      case RobotStatus.navigatingToWard:
+      case RobotStatus.enRoute:
         return Icons.navigation_outlined;
-      case RobotStatus.segregatingWaste:
+      case RobotStatus.collecting:
         return Icons.scanner_outlined;
-      case RobotStatus.returningToDisposal:
-        return Icons.undo_outlined;
-      case RobotStatus.dockedCharging:
+      case RobotStatus.discharging:
+        return Icons.restore_from_trash_outlined;
+      case RobotStatus.docked:
         return Icons.battery_charging_full_outlined;
-      case RobotStatus.emergencyStop:
+      case RobotStatus.offline:
         return Icons.dangerous_outlined;
     }
+  }
+}
+
+class Compartment {
+  final String id;
+  final String name;
+  final Color badgeColor;
+  final Color lightColor;
+  final double currentWeightKg;
+  final double capacityKg;
+  final int fillPercentage;
+  final bool isFull;
+
+  Compartment({
+    required this.id,
+    required this.name,
+    required this.badgeColor,
+    required this.lightColor,
+    required this.currentWeightKg,
+    required this.capacityKg,
+    required this.fillPercentage,
+    required this.isFull,
+  });
+
+  double get fillRatio => (fillPercentage / 100.0).clamp(0.0, 1.0);
+  bool get isWarning => fillPercentage >= 85;
+
+  Compartment copyWith({
+    String? id,
+    String? name,
+    Color? badgeColor,
+    Color? lightColor,
+    double? currentWeightKg,
+    double? capacityKg,
+    int? fillPercentage,
+    bool? isFull,
+  }) {
+    return Compartment(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      badgeColor: badgeColor ?? this.badgeColor,
+      lightColor: lightColor ?? this.lightColor,
+      currentWeightKg: currentWeightKg ?? this.currentWeightKg,
+      capacityKg: capacityKg ?? this.capacityKg,
+      fillPercentage: fillPercentage ?? this.fillPercentage,
+      isFull: isFull ?? this.isFull,
+    );
   }
 }
 
@@ -131,43 +185,63 @@ class SubsystemHealth {
 }
 
 class RobotModel {
-  final String id;
-  final String name;
+  final String id; // e.g., 'R01'
+  final String name; // 'Sanitation Rover 1'
+  final String assignedWard;
   final RobotStatus status;
-  final double batteryPercent;
+  final int batteryLevel; // percentage
   final double voltage;
+  final double temperatureC;
+  final Map<String, Compartment> compartments; // 5 compartments
+  final bool aiCameraActive;
+
+  // Supplementary telemetry & diagnostics
   final double currentAmps;
-  final double tempCelsius;
-  final String currentWard;
   final RobotCoordinates coordinates;
   final SubsystemHealth health;
   final DateTime lastHeartbeat;
   final bool isOnline;
 
-  const RobotModel({
+  RobotModel({
     required this.id,
     required this.name,
+    required this.assignedWard,
     required this.status,
-    required this.batteryPercent,
+    required this.batteryLevel,
     required this.voltage,
-    required this.currentAmps,
-    required this.tempCelsius,
-    required this.currentWard,
-    required this.coordinates,
-    required this.health,
-    required this.lastHeartbeat,
-    this.isOnline = true,
-  });
+    required this.temperatureC,
+    required this.compartments,
+    required this.aiCameraActive,
+    this.currentAmps = 1.8,
+    this.coordinates = const RobotCoordinates(x: 120.0, y: 85.0, headingDegrees: 45.0),
+    this.health = const SubsystemHealth(),
+    DateTime? lastHeartbeat,
+    bool? isOnline,
+  })  : lastHeartbeat = lastHeartbeat ?? DateTime.now(),
+        isOnline = isOnline ?? (status != RobotStatus.offline);
+
+  // Backward-compatibility getters
+  double get batteryPercent => batteryLevel.toDouble();
+  String get currentWard => assignedWard;
+  double get tempCelsius => temperatureC;
+
+  double get totalCurrentKg =>
+      compartments.values.fold(0.0, (sum, c) => sum + c.currentWeightKg);
+
+  double get totalCapacityKg =>
+      compartments.values.fold(0.0, (sum, c) => sum + c.capacityKg);
 
   RobotModel copyWith({
     String? id,
     String? name,
+    String? assignedWard,
     RobotStatus? status,
-    double? batteryPercent,
+    int? batteryLevel,
     double? voltage,
+    double? temperatureC,
+    Map<String, Compartment>? compartments,
+    bool? aiCameraActive,
     double? currentAmps,
-    double? tempCelsius,
-    String? currentWard,
     RobotCoordinates? coordinates,
     SubsystemHealth? health,
     DateTime? lastHeartbeat,
@@ -176,12 +250,14 @@ class RobotModel {
     return RobotModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      assignedWard: assignedWard ?? this.assignedWard,
       status: status ?? this.status,
-      batteryPercent: batteryPercent ?? this.batteryPercent,
+      batteryLevel: batteryLevel ?? this.batteryLevel,
       voltage: voltage ?? this.voltage,
+      temperatureC: temperatureC ?? this.temperatureC,
+      compartments: compartments ?? this.compartments,
+      aiCameraActive: aiCameraActive ?? this.aiCameraActive,
       currentAmps: currentAmps ?? this.currentAmps,
-      tempCelsius: tempCelsius ?? this.tempCelsius,
-      currentWard: currentWard ?? this.currentWard,
       coordinates: coordinates ?? this.coordinates,
       health: health ?? this.health,
       lastHeartbeat: lastHeartbeat ?? this.lastHeartbeat,

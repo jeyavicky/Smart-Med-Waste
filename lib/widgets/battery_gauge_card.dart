@@ -24,8 +24,15 @@ class BatteryGaugeCard extends StatelessWidget {
         border: Border.all(
           color: isWarning
               ? AppConstants.amberWarning
-              : (isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0)),
+              : (isDark ? AppConstants.borderSlate : AppConstants.cardBorder),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withOpacity(isDark ? 0.2 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,42 +40,53 @@ class BatteryGaugeCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: (isWarning ? AppConstants.amberWarning : AppConstants.tealAccent)
-                          .withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      isWarning
-                          ? Icons.battery_alert_rounded
-                          : Icons.battery_charging_full_rounded,
-                      color: isWarning ? AppConstants.amberWarning : AppConstants.tealAccent,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Power & Battery BMS',
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: (isWarning ? AppConstants.amberWarning : AppConstants.medicalTeal)
+                            .withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      Text(
-                        'LiFePO4 4S 24Ah Clinical Pack',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
-                        ),
+                      child: Icon(
+                        isWarning
+                            ? Icons.battery_alert_rounded
+                            : Icons.battery_charging_full_rounded,
+                        color: isWarning ? AppConstants.amberWarning : AppConstants.medicalTeal,
+                        size: 20,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Power & Battery BMS',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'LiFePO4 4S 24Ah Clinical Pack • ${robot.name}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -79,7 +97,7 @@ class BatteryGaugeCard extends StatelessWidget {
                   'HEALTH: 99%',
                   style: TextStyle(
                     color: Color(0xFF10B981),
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                     fontSize: 10,
                   ),
                 ),
@@ -99,7 +117,7 @@ class BatteryGaugeCard extends StatelessWidget {
                   fontSize: 36,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -1,
-                  color: isWarning ? AppConstants.amberWarning : AppConstants.tealAccent,
+                  color: isWarning ? AppConstants.amberWarning : AppConstants.clinicalNavy,
                 ),
               ),
               const SizedBox(width: 12),
@@ -110,13 +128,17 @@ class BatteryGaugeCard extends StatelessWidget {
                   children: [
                     Text(
                       '${Formatters.formatRuntimeEstimate(robot.batteryPercent)} remaining',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: isDark ? Colors.white : AppConstants.textPrimary,
+                      ),
                     ),
                     Text(
                       'Estimated standby ~14.2h',
                       style: TextStyle(
                         fontSize: 11,
-                        color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                        color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                       ),
                     ),
                   ],
@@ -133,9 +155,9 @@ class BatteryGaugeCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: (robot.batteryPercent / 100.0).clamp(0.0, 1.0),
               minHeight: 8,
-              backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              backgroundColor: isDark ? const Color(0xFF334155) : AppConstants.cardBorder,
               valueColor: AlwaysStoppedAnimation<Color>(
-                isWarning ? AppConstants.amberWarning : AppConstants.tealAccent,
+                isWarning ? AppConstants.amberWarning : AppConstants.medicalTeal,
               ),
             ),
           ),
@@ -163,7 +185,7 @@ class BatteryGaugeCard extends StatelessWidget {
               _metricTile(
                 icon: Icons.thermostat_rounded,
                 label: 'CELL TEMP',
-                value: Formatters.formatTemperature(robot.tempCelsius),
+                value: Formatters.formatTemperature(robot.temperatureC),
                 isDark: isDark,
               ),
             ],
@@ -184,14 +206,14 @@ class BatteryGaugeCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 13, color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey),
+            Icon(icon, size: 13, color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary),
             const SizedBox(width: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                 letterSpacing: 0.5,
               ),
             ),
@@ -200,9 +222,10 @@ class BatteryGaugeCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w800,
+            color: isDark ? Colors.white : AppConstants.clinicalNavy,
           ),
         ),
       ],

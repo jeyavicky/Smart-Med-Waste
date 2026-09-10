@@ -9,31 +9,51 @@ class RobotProvider extends ChangeNotifier {
   final MockDataService _dataService = MockDataService.instance;
   final MqttService _mqttService = SimulatedMqttService.instance;
 
-  late RobotModel _robot;
+  late List<RobotModel> _fleet;
+  String _selectedRobotId = 'R01';
   Timer? _telemetryTicker;
   double _simulationSpeed = 1.0; // 1x, 2x, 5x, 0.0 (paused)
   bool _isManualDriveEnabled = false;
 
   // Hospital map waypoints for autonomous corridor transit
   final List<RobotCoordinates> _corridorWaypoints = const [
-    RobotCoordinates(x: 75.0, y: 65.0, headingDegrees: 0.0, floor: 'Floor 2 (ICU Wing)'), // ICU Drop Bay
-    RobotCoordinates(x: 140.0, y: 65.0, headingDegrees: 90.0, floor: 'Floor 2 (ICU Wing)'), // Airlock 1
-    RobotCoordinates(x: 140.0, y: 160.0, headingDegrees: 180.0, floor: 'Floor 2 (Corridor B)'), // Central Corridor
-    RobotCoordinates(x: 230.0, y: 160.0, headingDegrees: 90.0, floor: 'Floor 2 (Corridor B)'), // Transfer Bay
-    RobotCoordinates(x: 230.0, y: 260.0, headingDegrees: 180.0, floor: 'Basement Disinfection Hub'), // Central Waste
+    RobotCoordinates(x: 75.0, y: 65.0, headingDegrees: 0.0, floor: 'Floor 2 (ICU Wing)'),
+    RobotCoordinates(x: 140.0, y: 65.0, headingDegrees: 90.0, floor: 'Floor 2 (ICU Wing)'),
+    RobotCoordinates(x: 140.0, y: 160.0, headingDegrees: 180.0, floor: 'Floor 2 (Corridor B)'),
+    RobotCoordinates(x: 230.0, y: 160.0, headingDegrees: 90.0, floor: 'Floor 3 (OT Block)'),
+    RobotCoordinates(x: 230.0, y: 260.0, headingDegrees: 180.0, floor: 'Basement Disinfection Hub'),
   ];
   int _currentWaypointIndex = 0;
 
   RobotProvider() {
-    _robot = _dataService.getInitialRobot();
+    _fleet = _dataService.getInitialFleet();
     _startTelemetryLoop();
   }
 
-  RobotModel get robot => _robot;
+  List<RobotModel> get fleet => List.unmodifiable(_fleet);
+  String get selectedRobotId => _selectedRobotId;
+
+  RobotModel get selectedRobot {
+    return _fleet.firstWhere(
+      (r) => r.id == _selectedRobotId,
+      orElse: () => _fleet.first,
+    );
+  }
+
+  // Backward compatibility getter
+  RobotModel get robot => selectedRobot;
+
   double get simulationSpeed => _simulationSpeed;
   bool get isManualDriveEnabled => _isManualDriveEnabled;
   List<RobotCoordinates> get corridorWaypoints => _corridorWaypoints;
   int get currentWaypointIndex => _currentWaypointIndex;
+
+  void selectRobot(String id) {
+    if (_selectedRobotId != id && _fleet.any((r) => r.id == id)) {
+      _selectedRobotId = id;
+      notifyListeners();
+    }
+  }
 
   void setSimulationSpeed(double speed) {
     _simulationSpeed = speed;
@@ -46,18 +66,22 @@ class RobotProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Emergency Stop Action: Immediately halts all drive motors and engages safety locks
+  /// Emergency Stop Action: Immediately halts drive motors for the selected robot
   void triggerEmergencyStop() {
-    _robot = _robot.copyWith(
-      status: RobotStatus.emergencyStop,
+    final index = _fleet.indexWhere((r) => r.id == _selectedRobotId);
+    if (index == -1) return;
+
+    final current = _fleet[index];
+    _fleet[index] = current.copyWith(
+      status: RobotStatus.offline,
       currentAmps: 0.0,
-      health: _robot.health.copyWith(driveMotors: false),
+      health: current.health.copyWith(driveMotors: false),
       lastHeartbeat: DateTime.now(),
     );
 
     _mqttService.publish(ApiConstants.topicEmergencyStop, {
       'action': 'ESTOP_TRIGGERED',
-      'robotId': _robot.id,
+      'robotId': current.id,
       'timestamp': DateTime.now().toIso8601String(),
     });
 
@@ -66,35 +90,48 @@ class RobotProvider extends ChangeNotifier {
 
   /// Resumes normal autonomous operations after E-Stop clearance
   void resumeOperations() {
-    _robot = _robot.copyWith(
+    final index = _fleet.indexWhere((r) => r.id == _selectedRobotId);
+    if (index == -1) return;
+
+    final current = _fleet[index];
+    _fleet[index] = current.copyWith(
       status: RobotStatus.idle,
       currentAmps: 1.8,
-      health: _robot.health.copyWith(driveMotors: true),
+      health: current.health.copyWith(driveMotors: true),
       lastHeartbeat: DateTime.now(),
     );
     notifyListeners();
   }
 
   /// Updates robot status during mission lifecycle
-  void updateStatus(RobotStatus newStatus, {String? wardName}) {
-    _robot = _robot.copyWith(
+  void updateStatus(RobotStatus newStatus, {String? wardName, String? targetRobotId}) {
+    final idToUpdate = targetRobotId ?? _selectedRobotId;
+    final index = _fleet.indexWhere((r) => r.id == idToUpdate);
+    if (index == -1) return;
+
+    final current = _fleet[index];
+    _fleet[index] = current.copyWith(
       status: newStatus,
-      currentWard: wardName ?? _robot.currentWard,
+      assignedWard: wardName ?? current.assignedWard,
       lastHeartbeat: DateTime.now(),
     );
     notifyListeners();
   }
 
-  /// Cycles autonomous robot position along corridor
+  /// Cycles autonomous robot position along corridor for selected robot
   void stepAutonomousTransit() {
-    if (_robot.status == RobotStatus.emergencyStop) return;
+    final index = _fleet.indexWhere((r) => r.id == _selectedRobotId);
+    if (index == -1) return;
+
+    final current = _fleet[index];
+    if (current.status == RobotStatus.offline) return;
 
     _currentWaypointIndex = (_currentWaypointIndex + 1) % _corridorWaypoints.length;
     final target = _corridorWaypoints[_currentWaypointIndex];
 
-    _robot = _robot.copyWith(
+    _fleet[index] = current.copyWith(
       coordinates: target,
-      currentWard: target.floor,
+      assignedWard: target.floor,
       lastHeartbeat: DateTime.now(),
     );
     notifyListeners();
@@ -107,39 +144,44 @@ class RobotProvider extends ChangeNotifier {
     final intervalMs = (2500 / _simulationSpeed).round().clamp(500, 5000);
 
     _telemetryTicker = Timer.periodic(Duration(milliseconds: intervalMs), (timer) {
-      if (_robot.status == RobotStatus.emergencyStop) return;
+      bool hasChanged = false;
 
-      // Slight natural variance in telemetry
-      double newBattery = _robot.batteryPercent;
-      double newAmps = _robot.currentAmps;
-      double newTemp = _robot.tempCelsius;
+      for (int i = 0; i < _fleet.length; i++) {
+        final bot = _fleet[i];
+        if (bot.status == RobotStatus.offline) continue;
 
-      if (_robot.status == RobotStatus.dockedCharging) {
-        newBattery = (_robot.batteryPercent + 0.1).clamp(0.0, 100.0);
-        newAmps = 4.5; // Charging current
-      } else {
-        newBattery = (_robot.batteryPercent - 0.02).clamp(0.0, 100.0);
+        double newBattery = bot.batteryPercent;
+        double newAmps = bot.currentAmps;
+        double newTemp = bot.temperatureC;
+
+        if (bot.status == RobotStatus.docked) {
+          newBattery = (bot.batteryPercent + 0.1).clamp(0.0, 100.0);
+          newAmps = 4.5;
+        } else {
+          newBattery = (bot.batteryPercent - 0.02).clamp(0.0, 100.0);
+        }
+
+        final voltWobble = 11.9 + (DateTime.now().second % 6) * 0.05;
+        newTemp = 29.5 + (DateTime.now().second % 4) * 0.3;
+
+        _fleet[i] = bot.copyWith(
+          batteryLevel: newBattery.round(),
+          voltage: voltWobble,
+          currentAmps: newAmps,
+          temperatureC: newTemp,
+          lastHeartbeat: DateTime.now(),
+        );
+        hasChanged = true;
       }
 
-      // Small wobble in voltage & temp
-      final voltWobble = 11.9 + (DateTime.now().second % 6) * 0.05;
-      newTemp = 30.2 + (DateTime.now().second % 4) * 0.2;
-
-      _robot = _robot.copyWith(
-        batteryPercent: newBattery,
-        voltage: voltWobble,
-        currentAmps: newAmps,
-        tempCelsius: newTemp,
-        lastHeartbeat: DateTime.now(),
-      );
-
-      // If in transit, automatically step position
-      if (_robot.status == RobotStatus.navigatingToWard ||
-          _robot.status == RobotStatus.returningToDisposal) {
+      // If active selected robot is in transit, step position
+      if (selectedRobot.status == RobotStatus.enRoute) {
         stepAutonomousTransit();
       }
 
-      notifyListeners();
+      if (hasChanged) {
+        notifyListeners();
+      }
     });
   }
 

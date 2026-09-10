@@ -8,6 +8,7 @@ import '../../providers/robot_provider.dart';
 import '../../providers/waste_analytics_provider.dart';
 import '../../widgets/compartment_bar_widget.dart';
 import '../../widgets/robot_status_card.dart';
+import '../../widgets/robot_fleet_selector.dart';
 import '../alerts/alerts_screen.dart';
 import '../collection/request_collection_sheet.dart';
 import '../tracking/tracking_screen.dart';
@@ -25,7 +26,6 @@ class DashboardScreen extends StatelessWidget {
 
     final robot = robotProvider.robot;
     final activeMission = missionProvider.activeMission;
-    final compartments = wasteProvider.compartments;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -35,31 +35,37 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text(AppConstants.appName),
+                const Text(
+                  AppConstants.appName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.3,
+                  ),
+                ),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: AppConstants.tealPrimary.withOpacity(0.15),
+                    color: AppConstants.medicalTeal.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
-                    'ICU WING',
-                    style: TextStyle(
+                  child: Text(
+                    robot.id,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
-                      color: AppConstants.tealAccent,
+                      color: AppConstants.medicalTeal,
                     ),
                   ),
                 ),
               ],
             ),
             Text(
-              'Apollo Apex Hospital • Fleet Node R-01',
+              'Apollo Apex Hospital • ${robot.name}',
               style: TextStyle(
                 fontSize: 11,
-                color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
-                fontWeight: FontWeight.w500,
+                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -107,20 +113,25 @@ class DashboardScreen extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await Future.delayed(const Duration(milliseconds: 500));
+          await Future.delayed(const Duration(milliseconds: 400));
         },
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Active Mission Alert Banner (if in transit or collecting)
+            // Persistent Multi-Robot Fleet Selector
+            const RobotFleetSelector(),
+
+            const SizedBox(height: 16),
+
+            // Active Mission Alert Banner (if collecting or enRoute)
             if (activeMission != null &&
                 activeMission.status != MissionStatus.completed &&
                 activeMission.status != MissionStatus.cancelled) ...[
-              _buildActiveMissionBanner(context, activeMission, robotProvider, missionProvider, isDark),
+              _buildActiveMissionBanner(context, activeMission, robotProvider, isDark),
               const SizedBox(height: 16),
             ],
 
-            // Robot Hero Card
+            // Active Selected Robot Hero Card
             RobotStatusCard(
               robot: robot,
               robotProvider: robotProvider,
@@ -134,7 +145,7 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Quick Actions Shortcut Bar
-            _buildQuickActionButtons(context, robotProvider, isDark),
+            _buildQuickActionButtons(context, isDark),
 
             const SizedBox(height: 16),
 
@@ -143,22 +154,26 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 4 Compartment Status Bars Section
+            // 5-Compartment Status Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Live Compartment Fill Levels',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                    Text(
+                      '5-Chamber Waste Levels (${robot.id})',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                      ),
                     ),
                     Text(
-                      'Real-time strain gauge weight sensors (±1g)',
+                      'Internal hermetic isolation • Strain gauge load cells (±1g)',
                       style: TextStyle(
                         fontSize: 11,
-                        color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                        color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                       ),
                     ),
                   ],
@@ -169,18 +184,18 @@ class DashboardScreen extends StatelessWidget {
                       MaterialPageRoute(builder: (_) => const HistoryScreen()),
                     );
                   },
-                  child: const Text('CPCB Ledger', style: TextStyle(fontSize: 12)),
+                  child: const Text('CPCB Ledger', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                 ),
               ],
             ),
 
             const SizedBox(height: 10),
 
-            // The 4 Compartments
-            ...compartments.map(
+            // The 5 Compartments of the active AMR
+            ...robot.compartments.values.map(
               (comp) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: CompartmentBarWidget(
+                child: CompartmentBarWidget.fromCompartment(
                   compartment: comp,
                   onTap: () {
                     Navigator.of(context).push(
@@ -202,20 +217,19 @@ class DashboardScreen extends StatelessWidget {
     BuildContext context,
     MissionModel mission,
     RobotProvider robotProvider,
-    MissionProvider missionProvider,
     bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: mission.priority == MissionPriority.emergencyBiologicalSpill
-            ? AppConstants.crimsonDanger.withOpacity(0.18)
-            : AppConstants.tealPrimary.withOpacity(0.18),
+            ? AppConstants.crimsonDanger.withOpacity(0.12)
+            : AppConstants.medicalTeal.withOpacity(0.10),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: mission.priority == MissionPriority.emergencyBiologicalSpill
               ? AppConstants.crimsonDanger
-              : AppConstants.tealAccent,
+              : AppConstants.medicalTeal,
           width: 1.5,
         ),
       ),
@@ -226,8 +240,8 @@ class DashboardScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: (mission.priority == MissionPriority.emergencyBiologicalSpill
                       ? AppConstants.crimsonDanger
-                      : AppConstants.tealAccent)
-                  .withOpacity(0.25),
+                      : AppConstants.medicalTeal)
+                  .withOpacity(0.20),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -236,7 +250,7 @@ class DashboardScreen extends StatelessWidget {
                   : Icons.near_me_rounded,
               color: mission.priority == MissionPriority.emergencyBiologicalSpill
                   ? AppConstants.crimsonDanger
-                  : AppConstants.tealAccent,
+                  : AppConstants.medicalTeal,
               size: 20,
             ),
           ),
@@ -259,14 +273,21 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       '#${mission.missionId}',
-                      style: const TextStyle(fontSize: 11, color: AppConstants.lightSlate),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${mission.department} • Destination: ${mission.stationId}',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                  ),
                 ),
               ],
             ),
@@ -284,7 +305,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActionButtons(BuildContext context, RobotProvider robotProvider, bool isDark) {
+  Widget _buildQuickActionButtons(BuildContext context, bool isDark) {
     return Row(
       children: [
         // Camera View HUD Shortcut
@@ -293,7 +314,7 @@ class DashboardScreen extends StatelessWidget {
             context,
             icon: Icons.camera_alt_rounded,
             label: 'AI Camera HUD',
-            color: AppConstants.tealAccent,
+            color: AppConstants.medicalTeal,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const AiDetectionScreen()),
@@ -310,7 +331,7 @@ class DashboardScreen extends StatelessWidget {
             context,
             icon: Icons.map_rounded,
             label: 'Corridor Map',
-            color: const Color(0xFF38BDF8),
+            color: const Color(0xFF2563EB),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const TrackingScreen()),
@@ -353,8 +374,15 @@ class DashboardScreen extends StatelessWidget {
           color: isDark ? AppConstants.surfaceSlate : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+            color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withOpacity(isDark ? 0.2 : 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -362,7 +390,11 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 11,
+                color: isDark ? Colors.white : AppConstants.clinicalNavy,
+              ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
             ),
@@ -383,8 +415,15 @@ class DashboardScreen extends StatelessWidget {
         color: isDark ? AppConstants.surfaceSlate : Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+          color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withOpacity(isDark ? 0.2 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,13 +434,13 @@ class DashboardScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "TODAY'S PROCESSED MEDICAL WASTE",
                     style: TextStyle(
                       fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                      color: AppConstants.neutralGrey,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                      color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -411,17 +450,18 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       Text(
                         Formatters.formatWeight(wasteProvider.todayTotalWeightKg),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
+                          color: isDark ? Colors.white : AppConstants.clinicalNavy,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.15),
+                          color: const Color(0xFF10B981).withOpacity(0.12),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -429,7 +469,7 @@ class DashboardScreen extends StatelessWidget {
                           style: const TextStyle(
                             color: Color(0xFF10B981),
                             fontSize: 10,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
@@ -440,12 +480,12 @@ class DashboardScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppConstants.tealPrimary.withOpacity(0.12),
+                  color: AppConstants.medicalTeal.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.auto_graph_rounded,
-                  color: AppConstants.tealAccent,
+                  color: AppConstants.medicalTeal,
                   size: 24,
                 ),
               ),
@@ -456,16 +496,18 @@ class DashboardScreen extends StatelessWidget {
           const Divider(),
           const SizedBox(height: 10),
 
-          // Micro-breakdown across 4 categories
+          // 5-Compartment Micro-breakdown Row
           Row(
             children: [
-              _microStat('Sharps', '1.85 kg', AppConstants.sharpsAccent),
-              _verticalDivider(),
-              _microStat('Infectious', '8.60 kg', AppConstants.infectiousColor),
-              _verticalDivider(),
-              _microStat('Plastic', '4.20 kg', AppConstants.plasticColor),
-              _verticalDivider(),
-              _microStat('Other', '2.10 kg', AppConstants.otherColor),
+              _microStat('Sharps', '1.85 kg', AppConstants.sharpsBadge, isDark),
+              _verticalDivider(isDark),
+              _microStat('Infectious', '8.60 kg', AppConstants.infectiousBadge, isDark),
+              _verticalDivider(isDark),
+              _microStat('Plastic', '4.20 kg', AppConstants.plasticBadge, isDark),
+              _verticalDivider(isDark),
+              _microStat('Glass', '2.10 kg', AppConstants.glasswareBadge, isDark),
+              _verticalDivider(isDark),
+              _microStat('Unknown', '0.65 kg', AppConstants.unknownBadge, isDark),
             ],
           ),
         ],
@@ -473,30 +515,35 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _microStat(String label, String value, Color color) {
+  Widget _microStat(String label, String value, Color color, bool isDark) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color),
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Text(
             value,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: isDark ? Colors.white : AppConstants.clinicalNavy,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _verticalDivider() {
+  Widget _verticalDivider(bool isDark) {
     return Container(
       width: 1,
-      height: 24,
-      color: AppConstants.borderSlate,
+      height: 22,
+      color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
     );
   }
 }

@@ -22,9 +22,11 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.text('Robot'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Robot Telemetry & Diagnostics'), findsOneWidget);
+    await tester.drag(find.text('Power & Battery BMS'), const Offset(0, -300));
+    await tester.pumpAndSettle();
     expect(find.text('Subsystem Diagnostics Checklist'), findsOneWidget);
   });
 
@@ -37,7 +39,19 @@ void main() {
 
     expect(find.text('Waste Segregation & Compartments'), findsOneWidget);
     expect(find.text('Open Onboard AI Vision HUD'), findsOneWidget);
-    expect(find.text('4 Standard Biomedical Compartments'), findsOneWidget);
+    expect(find.text('5 Standard Biomedical Compartments'), findsOneWidget);
+  });
+
+  testWidgets('Fleet Selector displays all 4 AMRs', (WidgetTester tester) async {
+    await tester.pumpWidget(const SmartMedWasteApp());
+    await tester.pump();
+
+    expect(find.text('FLEET ORCHESTRATION'), findsOneWidget);
+    expect(find.text('4 AMRs ONLINE'), findsOneWidget);
+    expect(find.text('R01'), findsWidgets);
+    expect(find.text('R02'), findsWidgets);
+    expect(find.text('R03'), findsWidgets);
+    expect(find.text('R04'), findsWidgets);
   });
 
   testWidgets('Open Request Pickup bottom sheet', (WidgetTester tester) async {

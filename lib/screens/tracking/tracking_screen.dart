@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_constants.dart';
 import '../../models/robot_model.dart';
 import '../../providers/robot_provider.dart';
+import '../../widgets/robot_fleet_selector.dart';
 
 class TrackingScreen extends StatefulWidget {
   const TrackingScreen({super.key});
@@ -39,11 +40,24 @@ class _TrackingScreenState extends State<TrackingScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hospital Autonomous Transit Map'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Hospital Autonomous Transit Map', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            Text(
+              'Tracking: ${robot.name} (${robot.id})',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'Simulate Step Transit',
-            icon: const Icon(Icons.fast_forward_rounded, color: AppConstants.tealAccent),
+            icon: const Icon(Icons.fast_forward_rounded, color: AppConstants.medicalTeal),
             onPressed: () {
               robotProvider.stepAutonomousTransit();
             },
@@ -52,10 +66,23 @@ class _TrackingScreenState extends State<TrackingScreen>
       ),
       body: Column(
         children: [
+          // Fleet Selector Bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: const RobotFleetSelector(),
+          ),
+
           // Current Transit Status Banner
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: isDark ? AppConstants.surfaceSlate : const Color(0xFFF1F5F9),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark ? AppConstants.surfaceSlate : Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
+              ),
+            ),
             child: Row(
               children: [
                 Container(

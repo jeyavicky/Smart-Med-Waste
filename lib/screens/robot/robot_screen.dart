@@ -4,6 +4,7 @@ import '../../core/constants/app_constants.dart';
 import '../../providers/robot_provider.dart';
 import '../../widgets/battery_gauge_card.dart';
 import '../../widgets/robot_status_card.dart';
+import '../../widgets/robot_fleet_selector.dart';
 import '../tracking/tracking_screen.dart';
 
 class RobotScreen extends StatelessWidget {
@@ -17,11 +18,24 @@ class RobotScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Robot Telemetry & Diagnostics'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Robot Telemetry & Diagnostics', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            Text(
+              'Node: ${robot.name} (${robot.id}) • ${robot.assignedWard}',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'Autonomous Map',
-            icon: const Icon(Icons.map_rounded, color: AppConstants.tealAccent),
+            icon: const Icon(Icons.map_rounded, color: AppConstants.medicalTeal),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const TrackingScreen()),
@@ -33,7 +47,12 @@ class RobotScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Hero Status Card
+          // Persistent Multi-Robot Fleet Selector
+          const RobotFleetSelector(),
+
+          const SizedBox(height: 16),
+
+          // Selected AMR Hero Status Card
           RobotStatusCard(
             robot: robot,
             robotProvider: robotProvider,
@@ -58,8 +77,15 @@ class RobotScreen extends StatelessWidget {
               color: isDark ? AppConstants.surfaceSlate : Colors.white,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+                color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF0F172A).withOpacity(isDark ? 0.2 : 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,12 +94,16 @@ class RobotScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
-                      children: const [
-                        Icon(Icons.health_and_safety_rounded, color: Color(0xFF10B981), size: 20),
-                        SizedBox(width: 8),
+                      children: [
+                        const Icon(Icons.health_and_safety_rounded, color: Color(0xFF10B981), size: 20),
+                        const SizedBox(width: 8),
                         Text(
                           'Subsystem Diagnostics Checklist',
-                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                          ),
                         ),
                       ],
                     ),
@@ -118,13 +148,13 @@ class RobotScreen extends StatelessWidget {
                 ),
                 _diagnosticRow(
                   name: 'Precision Load Cells (Weight Sensing)',
-                  spec: '4x Strain Gauge HX711 ADCs • ±1g Precision',
+                  spec: '5x Strain Gauge HX711 ADCs • ±1g Precision',
                   statusOk: robot.health.loadCells,
                   isDark: isDark,
                 ),
                 _diagnosticRow(
-                  name: 'Internal Hermetic Locking Solenoids',
-                  spec: 'IP67 Bio-Seal Interlocks & UV-C Disinfection Tube',
+                  name: '5-Chamber Hermetic Locking Solenoids',
+                  spec: 'IP67 Bio-Seal Interlocks & UV-C 254nm Lamp Active',
                   statusOk: robot.health.internalLocking,
                   isDark: isDark,
                   isLast: true,
@@ -146,23 +176,25 @@ class RobotScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppConstants.tealPrimary.withOpacity(0.2),
-                    AppConstants.surfaceSlate,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: isDark ? AppConstants.surfaceSlate : const Color(0xFFF0FDFA),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppConstants.tealAccent.withOpacity(0.4)),
+                border: Border.all(
+                  color: isDark ? AppConstants.borderSlate : AppConstants.medicalTeal.withOpacity(0.3),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppConstants.medicalTeal.withOpacity(0.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: const BoxDecoration(
-                      color: AppConstants.tealPrimary,
+                      color: AppConstants.medicalTeal,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.explore_rounded, color: Colors.white, size: 24),
@@ -172,22 +204,26 @@ class RobotScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Hospital Corridor SLAM Map',
-                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           'View real-time autonomous routing, obstacle avoidance, and waypoint progression',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                            color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppConstants.tealAccent),
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppConstants.medicalTeal),
                 ],
               ),
             ),
@@ -233,13 +269,17 @@ class RobotScreen extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                  ),
                 ),
                 Text(
                   spec,
                   style: TextStyle(
                     fontSize: 11,
-                    color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                    color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                   ),
                 ),
               ],
