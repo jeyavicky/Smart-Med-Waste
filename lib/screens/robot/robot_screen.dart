@@ -14,20 +14,24 @@ class RobotScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final robotProvider = context.watch<RobotProvider>();
     final robot = robotProvider.robot;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: AppConstants.canvasBg,
       appBar: AppBar(
+        backgroundColor: AppConstants.cardBg,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Robot Telemetry & Diagnostics', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            const Text(
+              'Robot Telemetry & Diagnostics',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppConstants.clinicalNavy),
+            ),
             Text(
               'Node: ${robot.name} (${robot.id}) • ${robot.assignedWard}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                fontWeight: FontWeight.w400,
+                color: AppConstants.textSecondary,
               ),
             ),
           ],
@@ -35,7 +39,7 @@ class RobotScreen extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: 'Autonomous Map',
-            icon: const Icon(Icons.map_rounded, color: AppConstants.medicalTeal),
+            icon: const Icon(Icons.map_outlined, color: AppConstants.clinicalNavy),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const TrackingScreen()),
@@ -50,7 +54,7 @@ class RobotScreen extends StatelessWidget {
           // Persistent Multi-Robot Fleet Selector
           const RobotFleetSelector(),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Selected AMR Hero Status Card
           RobotStatusCard(
@@ -63,26 +67,24 @@ class RobotScreen extends StatelessWidget {
             },
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Battery & BMS Card
           BatteryGaugeCard(robot: robot),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Subsystem Health Diagnostics Checklist
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
-              ),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF0F172A).withOpacity(isDark ? 0.2 : 0.04),
-                  blurRadius: 10,
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -94,15 +96,15 @@ class RobotScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
-                      children: [
-                        const Icon(Icons.health_and_safety_rounded, color: Color(0xFF10B981), size: 20),
-                        const SizedBox(width: 8),
+                      children: const [
+                        Icon(Icons.health_and_safety_rounded, color: AppConstants.statusNominal, size: 20),
+                        SizedBox(width: 8),
                         Text(
                           'Subsystem Diagnostics Checklist',
                           style: TextStyle(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             fontSize: 14,
-                            color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                            color: AppConstants.clinicalNavy,
                           ),
                         ),
                       ],
@@ -110,21 +112,22 @@ class RobotScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(6),
+                        color: AppConstants.statusNominal.withOpacity(0.10),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
                         'ALL PASS ✓',
                         style: TextStyle(
-                          color: Color(0xFF10B981),
-                          fontWeight: FontWeight.w800,
+                          color: AppConstants.statusNominal,
+                          fontWeight: FontWeight.w700,
                           fontSize: 10,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 const Divider(),
                 const SizedBox(height: 8),
 
@@ -132,38 +135,33 @@ class RobotScreen extends StatelessWidget {
                   name: 'Drive Motors & BLDC Controllers',
                   spec: 'Dual 24V Planetary Geared Motors • Zero Backlash',
                   statusOk: robot.health.driveMotors,
-                  isDark: isDark,
                 ),
                 _diagnosticRow(
                   name: 'LiDAR & Depth Perception',
                   spec: '360° 16-Beam LiDAR + RealSense RGB-D Optical Flow',
                   statusOk: robot.health.lidarDepthSensors,
-                  isDark: isDark,
                 ),
                 _diagnosticRow(
                   name: 'Onboard AI Edge Vision Camera',
                   spec: 'Sony IMX335 5MP • TensorRT Model @ 45 FPS',
                   statusOk: robot.health.aiVisionCamera,
-                  isDark: isDark,
                 ),
                 _diagnosticRow(
                   name: 'Precision Load Cells (Weight Sensing)',
                   spec: '5x Strain Gauge HX711 ADCs • ±1g Precision',
                   statusOk: robot.health.loadCells,
-                  isDark: isDark,
                 ),
                 _diagnosticRow(
                   name: '5-Chamber Hermetic Locking Solenoids',
                   spec: 'IP67 Bio-Seal Interlocks & UV-C 254nm Lamp Active',
                   statusOk: robot.health.internalLocking,
-                  isDark: isDark,
                   isLast: true,
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Autonomous Corridor Transit Shortcut Card
           InkWell(
@@ -172,19 +170,17 @@ class RobotScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const TrackingScreen()),
               );
             },
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? AppConstants.surfaceSlate : const Color(0xFFF0FDFA),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: isDark ? AppConstants.borderSlate : AppConstants.medicalTeal.withOpacity(0.3),
-                ),
+                color: AppConstants.cardBg,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppConstants.cardBorder, width: 1.0),
                 boxShadow: [
                   BoxShadow(
-                    color: AppConstants.medicalTeal.withOpacity(0.06),
-                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -193,37 +189,38 @@ class RobotScreen extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: AppConstants.medicalTeal,
+                    decoration: BoxDecoration(
+                      color: AppConstants.clinicalNavy.withOpacity(0.08),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.explore_rounded, color: Colors.white, size: 24),
+                    child: const Icon(Icons.explore_outlined, color: AppConstants.clinicalNavy, size: 22),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: const [
                         Text(
                           'Hospital Corridor SLAM Map',
                           style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15,
-                            color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                            color: AppConstants.clinicalNavy,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
-                          'View real-time autonomous routing, obstacle avoidance, and waypoint progression',
+                          'Real-time autonomous routing, obstacle avoidance & waypoint progression',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                            fontWeight: FontWeight.w400,
+                            color: AppConstants.textSecondary,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppConstants.medicalTeal),
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppConstants.coolSlate),
                 ],
               ),
             ),
@@ -239,11 +236,10 @@ class RobotScreen extends StatelessWidget {
     required String name,
     required String spec,
     required bool statusOk,
-    required bool isDark,
     bool isLast = false,
   }) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -252,14 +248,14 @@ class RobotScreen extends StatelessWidget {
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: statusOk
-                  ? const Color(0xFF10B981).withOpacity(0.15)
-                  : AppConstants.crimsonDanger.withOpacity(0.15),
+                  ? AppConstants.statusNominal.withOpacity(0.12)
+                  : AppConstants.crimsonDanger.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(
               statusOk ? Icons.check_rounded : Icons.close_rounded,
-              size: 14,
-              color: statusOk ? const Color(0xFF10B981) : AppConstants.crimsonDanger,
+              size: 13,
+              color: statusOk ? AppConstants.statusNominal : AppConstants.crimsonDanger,
             ),
           ),
           const SizedBox(width: 12),
@@ -269,17 +265,18 @@ class RobotScreen extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
                     fontSize: 13,
-                    color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                    color: AppConstants.clinicalNavy,
                   ),
                 ),
                 Text(
                   spec,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11,
-                    color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                    fontWeight: FontWeight.w400,
+                    color: AppConstants.textSecondary,
                   ),
                 ),
               ],
@@ -288,16 +285,17 @@ class RobotScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: (statusOk ? const Color(0xFF10B981) : AppConstants.crimsonDanger)
-                  .withOpacity(0.1),
+              color: (statusOk ? AppConstants.statusNominal : AppConstants.crimsonDanger)
+                  .withOpacity(0.10),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               statusOk ? 'NOMINAL' : 'FAULT',
               style: TextStyle(
                 fontSize: 9,
-                fontWeight: FontWeight.w800,
-                color: statusOk ? const Color(0xFF10B981) : AppConstants.crimsonDanger,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+                color: statusOk ? AppConstants.statusNominal : AppConstants.crimsonDanger,
               ),
             ),
           ),

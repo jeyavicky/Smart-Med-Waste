@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_constants.dart';
@@ -36,25 +35,26 @@ class _TrackingScreenState extends State<TrackingScreen>
   Widget build(BuildContext context) {
     final robotProvider = context.watch<RobotProvider>();
     final robot = robotProvider.robot;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentRoute = robotProvider.currentRoute;
     final currentWaypointIndex = robotProvider.currentWaypointIndex;
 
     return Scaffold(
+      backgroundColor: AppConstants.canvasBg,
       appBar: AppBar(
+        backgroundColor: AppConstants.cardBg,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Hospital Autonomous Transit Map',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppConstants.clinicalNavy),
             ),
             Text(
               'Tracking: ${robot.name} (${robot.id}) • Destination: ${robot.destination}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                fontWeight: FontWeight.w400,
+                color: AppConstants.textSecondary,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -63,12 +63,12 @@ class _TrackingScreenState extends State<TrackingScreen>
         actions: [
           IconButton(
             tooltip: 'Step Next Waypoint',
-            icon: const Icon(Icons.skip_next_rounded, color: AppConstants.medicalTeal),
+            icon: const Icon(Icons.skip_next_rounded, color: AppConstants.clinicalNavy),
             onPressed: () => robotProvider.stepAutonomousTransit(),
           ),
           IconButton(
-            tooltip: 'Reset to Route Start',
-            icon: const Icon(Icons.replay_rounded, color: AppConstants.textSecondary),
+            tooltip: 'Reset Route',
+            icon: const Icon(Icons.replay_rounded, color: AppConstants.coolSlate),
             onPressed: () => robotProvider.resetRoute(),
           ),
         ],
@@ -86,14 +86,12 @@ class _TrackingScreenState extends State<TrackingScreen>
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
-              ),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF0F172A).withOpacity(isDark ? 0.25 : 0.04),
+                  color: Colors.black.withOpacity(0.03),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -106,7 +104,7 @@ class _TrackingScreenState extends State<TrackingScreen>
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: robot.status.statusColor.withOpacity(0.18),
+                        color: robot.status.statusColor.withOpacity(0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(robot.status.icon, color: robot.status.statusColor, size: 18),
@@ -121,24 +119,25 @@ class _TrackingScreenState extends State<TrackingScreen>
                               Text(
                                 robot.status.displayName,
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                  letterSpacing: 0.5,
                                   color: robot.status.statusColor,
                                 ),
                               ),
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                                 decoration: BoxDecoration(
-                                  color: AppConstants.clinicalNavy.withOpacity(isDark ? 0.4 : 0.08),
+                                  color: AppConstants.clinicalNavy.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   robot.id,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppConstants.clinicalNavy,
                                   ),
                                 ),
                               ),
@@ -146,10 +145,10 @@ class _TrackingScreenState extends State<TrackingScreen>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Current: ${robot.currentWard}',
-                            style: TextStyle(
+                            'Current Location: ${robot.currentWard}',
+                            style: const TextStyle(
                               fontSize: 11,
-                              color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                              color: AppConstants.textSecondary,
                             ),
                           ),
                         ],
@@ -158,20 +157,21 @@ class _TrackingScreenState extends State<TrackingScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
+                        color: AppConstants.statusNominal.withOpacity(0.10),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.radar_rounded, size: 12, color: Color(0xFF10B981)),
+                          Icon(Icons.radar_rounded, size: 12, color: AppConstants.statusNominal),
                           SizedBox(width: 4),
                           Text(
                             'SLAM ACTIVE',
                             style: TextStyle(
-                              color: Color(0xFF10B981),
+                              color: AppConstants.statusNominal,
                               fontWeight: FontWeight.w700,
                               fontSize: 10,
+                              letterSpacing: 0.4,
                             ),
                           ),
                         ],
@@ -190,15 +190,15 @@ class _TrackingScreenState extends State<TrackingScreen>
                     Expanded(
                       child: Row(
                         children: [
-                          const Icon(Icons.flag_rounded, size: 14, color: AppConstants.medicalTeal),
+                          const Icon(Icons.flag_rounded, size: 14, color: AppConstants.clinicalNavy),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
                               'Target: ${robot.destination}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                                fontWeight: FontWeight.w600,
+                                color: AppConstants.clinicalNavy,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -210,14 +210,19 @@ class _TrackingScreenState extends State<TrackingScreen>
                     // Auto Transit Toggle Button
                     InkWell(
                       onTap: () => robotProvider.toggleAutoTransit(),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                           color: robotProvider.isAutoTraveling
-                              ? AppConstants.medicalTeal
-                              : (isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0)),
-                          borderRadius: BorderRadius.circular(8),
+                              ? AppConstants.clinicalNavy
+                              : AppConstants.surfaceInteractive,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: robotProvider.isAutoTraveling
+                                ? AppConstants.clinicalNavy
+                                : AppConstants.dividerSubtle,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -232,7 +237,8 @@ class _TrackingScreenState extends State<TrackingScreen>
                               robotProvider.isAutoTraveling ? 'PAUSE TRANSIT' : 'AUTO-TRAVEL',
                               style: TextStyle(
                                 fontSize: 10,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.4,
                                 color: robotProvider.isAutoTraveling ? Colors.white : AppConstants.clinicalNavy,
                               ),
                             ),
@@ -246,20 +252,21 @@ class _TrackingScreenState extends State<TrackingScreen>
             ),
           ),
 
-          // Main Hospital Map Canvas
+          // Main Hospital Map Canvas - High Contrast 2D Floor Plan
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0B1322) : const Color(0xFFE2E8F0),
-                  borderRadius: BorderRadius.circular(20),
+                  color: const Color(0xFFF1F5F9), // Slate 100 Architectural canvas
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isDark ? AppConstants.borderSlate : const Color(0xFFCBD5E1),
+                    color: AppConstants.dividerSubtle,
+                    width: 1.0,
                   ),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(10),
                   child: AnimatedBuilder(
                     animation: _pulseController,
                     builder: (context, child) {
@@ -270,7 +277,6 @@ class _TrackingScreenState extends State<TrackingScreen>
                           currentRoute: currentRoute,
                           currentWaypointIndex: currentWaypointIndex,
                           pulseProgress: _pulseController.value,
-                          isDark: isDark,
                         ),
                         child: const SizedBox.expand(),
                       );
@@ -285,14 +291,12 @@ class _TrackingScreenState extends State<TrackingScreen>
           Container(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-              border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
-              ),
+              color: AppConstants.cardBg,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF0F172A).withOpacity(isDark ? 0.3 : 0.05),
+                  color: Colors.black.withOpacity(0.04),
                   blurRadius: 10,
                   offset: const Offset(0, -3),
                 ),
@@ -308,15 +312,15 @@ class _TrackingScreenState extends State<TrackingScreen>
                     Expanded(
                       child: Row(
                         children: [
-                          const Icon(Icons.alt_route_rounded, size: 16, color: AppConstants.medicalTeal),
+                          const Icon(Icons.alt_route_rounded, size: 16, color: AppConstants.clinicalNavy),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              'Route to ${robot.destination}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
+                              'Transit Route: ${robot.destination}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
                                 fontSize: 13,
-                                color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                                color: AppConstants.clinicalNavy,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -329,12 +333,15 @@ class _TrackingScreenState extends State<TrackingScreen>
                       onPressed: () => robotProvider.stepAutonomousTransit(),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        minimumSize: const Size(0, 30),
+                        minimumSize: const Size(0, 32),
                         backgroundColor: AppConstants.clinicalNavy,
                         foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
                       ),
-                      icon: const Icon(Icons.navigation_rounded, size: 13),
-                      label: const Text('STEP TRANSIT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800)),
+                      icon: const Icon(Icons.navigation_rounded, size: 12),
+                      label: const Text('STEP TRANSIT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -348,7 +355,7 @@ class _TrackingScreenState extends State<TrackingScreen>
                       for (int i = 0; i < currentRoute.length; i++) ...[
                         InkWell(
                           onTap: () => robotProvider.navigateToWaypoint(i),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           child: _buildRouteStep(
                             index: i + 1,
                             title: currentRoute[i].title,
@@ -380,20 +387,20 @@ class _TrackingScreenState extends State<TrackingScreen>
     required bool isDestination,
   }) {
     final Color badgeColor = isCurrent
-        ? AppConstants.medicalTeal
-        : (isPassed ? const Color(0xFF10B981) : AppConstants.textSecondary);
+        ? AppConstants.clinicalNavy
+        : (isPassed ? AppConstants.statusNominal : AppConstants.textSecondary);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: isCurrent
-            ? AppConstants.medicalTeal.withOpacity(0.15)
-            : (isPassed ? const Color(0xFF10B981).withOpacity(0.08) : Colors.transparent),
-        borderRadius: BorderRadius.circular(10),
+            ? AppConstants.clinicalNavy.withOpacity(0.08)
+            : (isPassed ? AppConstants.statusNominal.withOpacity(0.08) : Colors.white),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isCurrent
-              ? AppConstants.medicalTeal
-              : (isPassed ? const Color(0xFF10B981) : const Color(0xFFCBD5E1)),
+              ? AppConstants.clinicalNavy
+              : (isPassed ? AppConstants.statusNominal : AppConstants.dividerSubtle),
           width: isCurrent ? 1.5 : 1.0,
         ),
       ),
@@ -415,8 +422,8 @@ class _TrackingScreenState extends State<TrackingScreen>
                 '$index. $title',
                 style: TextStyle(
                   fontSize: 11,
-                  fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w700,
-                  color: isCurrent ? AppConstants.medicalTeal : null,
+                  fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                  color: isCurrent ? AppConstants.clinicalNavy : AppConstants.textPrimary,
                 ),
               ),
             ],
@@ -424,7 +431,7 @@ class _TrackingScreenState extends State<TrackingScreen>
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(fontSize: 10, color: AppConstants.neutralGrey),
+            style: const TextStyle(fontSize: 10, color: AppConstants.textSecondary),
           ),
         ],
       ),
@@ -433,22 +440,21 @@ class _TrackingScreenState extends State<TrackingScreen>
 
   Widget _buildStepDivider({required bool isPassed}) {
     return Container(
-      width: 16,
+      width: 14,
       height: 2,
-      color: isPassed ? const Color(0xFF10B981) : const Color(0xFFCBD5E1),
+      color: isPassed ? AppConstants.statusNominal : AppConstants.dividerSubtle,
       margin: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 }
 
-/// Custom painter for schematic hospital floor plan, all AMRs, and active autonomous route
+/// Custom painter for schematic 2D clinical hospital floor plan, AMRs, and active autonomous route
 class _HospitalCorridorMapPainter extends CustomPainter {
   final RobotModel selectedRobot;
   final List<RobotModel> fleet;
   final List<RobotRouteStep> currentRoute;
   final int currentWaypointIndex;
   final double pulseProgress;
-  final bool isDark;
 
   _HospitalCorridorMapPainter({
     required this.selectedRobot,
@@ -456,7 +462,6 @@ class _HospitalCorridorMapPainter extends CustomPainter {
     required this.currentRoute,
     required this.currentWaypointIndex,
     required this.pulseProgress,
-    required this.isDark,
   });
 
   @override
@@ -466,7 +471,7 @@ class _HospitalCorridorMapPainter extends CustomPainter {
 
     // Background architectural grid
     final gridPaint = Paint()
-      ..color = (isDark ? const Color(0xFF1E293B) : const Color(0xFFCBD5E1)).withOpacity(0.35)
+      ..color = AppConstants.dividerSubtle.withOpacity(0.5)
       ..strokeWidth = 0.8;
 
     for (double x = 0; x < size.width; x += 25) {
@@ -477,28 +482,27 @@ class _HospitalCorridorMapPainter extends CustomPainter {
     }
 
     // Room 1: ICU Wing
-    _drawRoom(canvas, Rect.fromLTWH(20 * scaleX, 20 * scaleY, 90 * scaleX, 80 * scaleY), 'ICU WARD', isDark);
+    _drawRoom(canvas, Rect.fromLTWH(20 * scaleX, 20 * scaleY, 90 * scaleX, 80 * scaleY), 'ICU WARD');
 
     // Room 2: Operation Theatres (OT 1-4)
-    _drawRoom(canvas, Rect.fromLTWH(180 * scaleX, 20 * scaleY, 110 * scaleX, 80 * scaleY), 'OT COMPLEX', isDark);
+    _drawRoom(canvas, Rect.fromLTWH(180 * scaleX, 20 * scaleY, 110 * scaleX, 80 * scaleY), 'OT COMPLEX');
 
     // Room 3: Pathology Lab
-    _drawRoom(canvas, Rect.fromLTWH(20 * scaleX, 180 * scaleY, 90 * scaleX, 90 * scaleY), 'PATH LAB', isDark);
+    _drawRoom(canvas, Rect.fromLTWH(20 * scaleX, 180 * scaleY, 90 * scaleX, 90 * scaleY), 'PATH LAB');
 
     // Room 4: Central Waste Disposal Facility
     _drawRoom(
       canvas,
       Rect.fromLTWH(180 * scaleX, 200 * scaleY, 120 * scaleX, 110 * scaleY),
       'CENTRAL BIO DISPOSAL',
-      isDark,
       highlight: true,
     );
 
     // Dynamic Route Path for Currently Selected Robot
     if (currentRoute.isNotEmpty) {
       final pathPaint = Paint()
-        ..color = AppConstants.medicalTeal.withOpacity(0.75)
-        ..strokeWidth = 3.0
+        ..color = AppConstants.medicalTeal.withOpacity(0.7)
+        ..strokeWidth = 2.5
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
@@ -518,164 +522,127 @@ class _HospitalCorridorMapPainter extends CustomPainter {
         final isCurrent = currentWaypointIndex == i;
         final isDest = i == currentRoute.length - 1;
 
-        final Color dotColor = isCurrent
-            ? AppConstants.medicalTeal
-            : (isPassed ? const Color(0xFF10B981) : (isDest ? AppConstants.crimsonDanger : const Color(0xFF94A3B8)));
+        final dotPaint = Paint()
+          ..color = isDest
+              ? AppConstants.statusNominal
+              : (isCurrent
+                  ? AppConstants.clinicalNavy
+                  : (isPassed ? AppConstants.statusNominal : AppConstants.coolSlate))
+          ..style = PaintingStyle.fill;
 
-        canvas.drawCircle(pt, isCurrent ? 5.5 : 4.0, Paint()..color = dotColor);
-        canvas.drawCircle(
-          pt,
-          isCurrent ? 5.5 : 4.0,
-          Paint()
-            ..color = Colors.white
+        canvas.drawCircle(pt, isCurrent ? 5.5 : 3.5, dotPaint);
+
+        if (isCurrent) {
+          final ringPaint = Paint()
+            ..color = AppConstants.clinicalNavy.withOpacity(0.3)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.2,
-        );
+            ..strokeWidth = 1.5;
+          canvas.drawCircle(pt, 9.0, ringPaint);
+        }
       }
     }
 
-    // Draw Other Fleet Robots (Inactive Markers)
+    // Render other fleet robots on map
     for (final bot in fleet) {
       if (bot.id == selectedRobot.id) continue;
+      final bx = bot.coordinates.x * scaleX;
+      final by = bot.coordinates.y * scaleY;
 
-      final bx = (bot.coordinates.x * scaleX).clamp(10.0, size.width - 10);
-      final by = (bot.coordinates.y * scaleY).clamp(10.0, size.height - 10);
-      final botCenter = Offset(bx, by);
+      final botPaint = Paint()
+        ..color = AppConstants.coolSlate
+        ..style = PaintingStyle.fill;
 
-      // Other robot circular dot
-      canvas.drawCircle(
-        botCenter,
-        7,
-        Paint()..color = bot.status.statusColor.withOpacity(0.7),
-      );
-      canvas.drawCircle(
-        botCenter,
-        7,
-        Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5,
-      );
+      canvas.drawCircle(Offset(bx, by), 7, botPaint);
 
-      // Other robot ID text
-      final otherPainter = TextPainter(
-        text: TextSpan(
-          text: bot.id,
-          style: const TextStyle(
-            color: Colors.white,
-            backgroundColor: Color(0xCC0F172A),
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      otherPainter.paint(canvas, Offset(botCenter.dx - (otherPainter.width / 2), botCenter.dy - 18));
-    }
-
-    // Draw Active Selected Robot Position & Heading
-    final rx = (selectedRobot.coordinates.x * scaleX).clamp(10.0, size.width - 10);
-    final ry = (selectedRobot.coordinates.y * scaleY).clamp(10.0, size.height - 10);
-    final robotCenter = Offset(rx, ry);
-
-    // Pulsing radar ripple
-    final pulsePaint = Paint()
-      ..color = selectedRobot.status.statusColor.withOpacity((1.0 - pulseProgress).clamp(0.0, 1.0))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    canvas.drawCircle(robotCenter, 12 + (pulseProgress * 16), pulsePaint);
-
-    // Selected Robot Body
-    final robotBodyPaint = Paint()
-      ..color = selectedRobot.status.statusColor
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(robotCenter, 11, robotBodyPaint);
-    canvas.drawCircle(
-      robotCenter,
-      11,
-      Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5,
-    );
-
-    // Heading direction indicator arrow
-    final headingAngle = (selectedRobot.coordinates.headingDegrees * math.pi) / 180.0;
-    final headingTip = Offset(
-      robotCenter.dx + math.cos(headingAngle) * 18,
-      robotCenter.dy + math.sin(headingAngle) * 18,
-    );
-    canvas.drawLine(
-      robotCenter,
-      headingTip,
-      Paint()
-        ..color = Colors.white
-        ..strokeWidth = 3.2
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // Selected Robot Label - DYNAMIC ROBOT ID!
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: ' ${selectedRobot.id} • ${selectedRobot.name} ',
+      final textSpan = TextSpan(
+        text: bot.id,
         style: const TextStyle(
           color: Colors.white,
-          backgroundColor: Color(0xEE0F2942),
-          fontSize: 9,
-          fontWeight: FontWeight.w800,
+          fontSize: 8,
+          fontWeight: FontWeight.w700,
         ),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      )..layout();
+      textPainter.paint(canvas, Offset(bx - textPainter.width / 2, by - textPainter.height / 2));
+    }
+
+    // Selected Active AMR Rendering with Pulse
+    final rx = selectedRobot.coordinates.x * scaleX;
+    final ry = selectedRobot.coordinates.y * scaleY;
+
+    // Pulse animation ring
+    final pulsePaint = Paint()
+      ..color = AppConstants.medicalTeal.withOpacity((1.0 - pulseProgress) * 0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    canvas.drawCircle(Offset(rx, ry), 10 + (pulseProgress * 12), pulsePaint);
+
+    // Selected AMR solid marker
+    final selectedBotPaint = Paint()
+      ..color = AppConstants.clinicalNavy
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(rx, ry), 10, selectedBotPaint);
+
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.drawCircle(Offset(rx, ry), 10, borderPaint);
+
+    // AMR ID label inside marker
+    final activeTextSpan = TextSpan(
+      text: selectedRobot.id,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 8,
+        fontWeight: FontWeight.w800,
       ),
+    );
+    final activeTextPainter = TextPainter(
+      text: activeTextSpan,
       textDirection: TextDirection.ltr,
     )..layout();
-
-    textPainter.paint(canvas, Offset(robotCenter.dx - (textPainter.width / 2), robotCenter.dy - 26));
+    activeTextPainter.paint(canvas, Offset(rx - activeTextPainter.width / 2, ry - activeTextPainter.height / 2));
   }
 
-  void _drawRoom(Canvas canvas, Rect rect, String label, bool isDark, {bool highlight = false}) {
+  void _drawRoom(Canvas canvas, Rect rect, String name, {bool highlight = false}) {
     final fillPaint = Paint()
-      ..color = highlight
-          ? AppConstants.medicalTeal.withOpacity(0.15)
-          : (isDark ? const Color(0xFF131D31) : const Color(0xFFF8FAFC))
+      ..color = highlight ? const Color(0xFFFEF3C7) : Colors.white
       ..style = PaintingStyle.fill;
 
     final borderPaint = Paint()
-      ..color = highlight
-          ? AppConstants.medicalTeal.withOpacity(0.6)
-          : (isDark ? AppConstants.borderSlate : const Color(0xFFCBD5E1))
-      ..strokeWidth = 1.5
+      ..color = highlight ? AppConstants.amberWarning : AppConstants.dividerSubtle
+      ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
-    canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(8)), fillPaint);
-    canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(8)), borderPaint);
+    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(8));
+    canvas.drawRRect(rrect, fillPaint);
+    canvas.drawRRect(rrect, borderPaint);
 
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: label,
-        style: TextStyle(
-          color: highlight ? AppConstants.medicalTeal : (isDark ? AppConstants.lightSlate : AppConstants.neutralGrey),
-          fontSize: 10,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
-        ),
+    final textSpan = TextSpan(
+      text: name,
+      style: TextStyle(
+        color: highlight ? AppConstants.amberWarning : AppConstants.clinicalNavy,
+        fontSize: 9,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.5,
       ),
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: rect.width - 8);
-
-    textPainter.paint(
-      canvas,
-      Offset(rect.left + (rect.width - textPainter.width) / 2, rect.top + 10),
     );
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    textPainter.paint(canvas, Offset(rect.left + 8, rect.top + 8));
   }
 
   @override
   bool shouldRepaint(covariant _HospitalCorridorMapPainter oldDelegate) {
-    return oldDelegate.selectedRobot != selectedRobot ||
-        oldDelegate.selectedRobot.coordinates != selectedRobot.coordinates ||
-        oldDelegate.selectedRobot.status != selectedRobot.status ||
-        oldDelegate.currentWaypointIndex != currentWaypointIndex ||
-        oldDelegate.pulseProgress != pulseProgress ||
-        oldDelegate.isDark != isDark;
+    return oldDelegate.pulseProgress != pulseProgress ||
+        oldDelegate.selectedRobot.id != selectedRobot.id ||
+        oldDelegate.currentWaypointIndex != currentWaypointIndex;
   }
 }

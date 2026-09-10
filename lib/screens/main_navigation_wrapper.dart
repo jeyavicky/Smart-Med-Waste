@@ -45,13 +45,16 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => RequestCollectionSheet.show(context),
-        backgroundColor: AppConstants.tealPrimary,
+        backgroundColor: AppConstants.clinicalNavy,
         foregroundColor: Colors.white,
-        elevation: 6,
-        icon: const Icon(Icons.add_shopping_cart_rounded),
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
         label: const Text(
           'Request Pickup',
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.2),
+          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.3),
         ),
       ),
       bottomNavigationBar: NavigationBar(

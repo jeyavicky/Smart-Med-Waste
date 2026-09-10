@@ -10,11 +10,15 @@ class AnalyticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final analytics = context.watch<WasteAnalyticsProvider>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: AppConstants.canvasBg,
       appBar: AppBar(
-        title: const Text('Waste Generation & Compliance Analytics'),
+        backgroundColor: AppConstants.cardBg,
+        title: const Text(
+          'Waste Generation & Compliance Analytics',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppConstants.clinicalNavy),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -28,8 +32,7 @@ class AnalyticsScreen extends StatelessWidget {
                   value: '${analytics.cpcbComplianceScore}%',
                   subtitle: 'Bio-rules 2016 audited',
                   icon: Icons.verified_user_rounded,
-                  color: const Color(0xFF10B981),
-                  isDark: isDark,
+                  color: AppConstants.statusNominal,
                 ),
               ),
               const SizedBox(width: 12),
@@ -39,24 +42,28 @@ class AnalyticsScreen extends StatelessWidget {
                   value: '${analytics.segregationAccuracy}%',
                   subtitle: 'Computer Vision 45 FPS',
                   icon: Icons.auto_awesome_rounded,
-                  color: AppConstants.tealAccent,
-                  isDark: isDark,
+                  color: AppConstants.medicalTeal,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Daily Generation 7-Day Trend Chart Card
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
-              ),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,16 +73,17 @@ class AnalyticsScreen extends StatelessWidget {
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
+                      children: const [
+                        Text(
                           'Daily Waste Generation (Past 7 Days)',
-                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppConstants.clinicalNavy),
                         ),
                         Text(
                           'Total: 101.4 kg • Peak: 16.75 kg (Today)',
                           style: TextStyle(
                             fontSize: 11,
-                            color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                            fontWeight: FontWeight.w400,
+                            color: AppConstants.textSecondary,
                           ),
                         ),
                       ],
@@ -83,15 +91,15 @@ class AnalyticsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppConstants.tealPrimary.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(8),
+                        color: AppConstants.statusNominal.withOpacity(0.10),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
                         '+8.4% Today',
                         style: TextStyle(
-                          color: AppConstants.tealAccent,
+                          color: AppConstants.statusNominal,
                           fontWeight: FontWeight.w700,
-                          fontSize: 11,
+                          fontSize: 10,
                         ),
                       ),
                     ),
@@ -106,7 +114,6 @@ class AnalyticsScreen extends StatelessWidget {
                     painter: _DailyTrendChartPainter(
                       dataPoints: const [11.2, 14.8, 12.4, 16.1, 13.9, 15.2, 16.75],
                       days: const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
-                      isDark: isDark,
                     ),
                     child: const SizedBox.expand(),
                   ),
@@ -115,62 +122,73 @@ class AnalyticsScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // 4 Category Biomedical Waste Distribution
+          // 5-Category Biomedical Waste Distribution
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
-              ),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Biomedical Waste Category Share (Cumulative)',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppConstants.clinicalNavy),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'Automated color-coded segregation across 5 sealed internal chambers',
                   style: TextStyle(
                     fontSize: 11,
-                    color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                    fontWeight: FontWeight.w400,
+                    color: AppConstants.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                _categoryShareRow('Infectious Biohazard / Yellow Bin', 19.60, 0.51, AppConstants.infectiousBadge),
-                _categoryShareRow('Contaminated Plastic / Red Bin', 9.68, 0.25, AppConstants.plasticBadge),
-                _categoryShareRow('Sharps & Blades / White Vault', 3.94, 0.10, AppConstants.sharpsBadge),
-                _categoryShareRow('Glassware & Cytotoxic / Blue Bin', 3.67, 0.10, AppConstants.glasswareBadge),
-                _categoryShareRow('Unknown & Others / Fallback Bin', 1.50, 0.04, AppConstants.unknownBadge),
+                _categoryShareRow('Infectious / Pathological (Yellow)', 19.60, 0.51, AppConstants.infectiousBadge),
+                _categoryShareRow('Contaminated Plastics (Red)', 9.68, 0.25, AppConstants.plasticBadge),
+                _categoryShareRow('Sharps / Blades (White)', 3.94, 0.10, AppConstants.sharpsBadge),
+                _categoryShareRow('Glassware & Vials (Blue)', 3.67, 0.10, AppConstants.glasswareBadge),
+                _categoryShareRow('General / Unclassified (Fallback)', 1.50, 0.04, AppConstants.unknownBadge),
               ],
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Treatment Facility Routing Breakdown
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
-              ),
+              color: AppConstants.cardBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Hospital Central Treatment Disposal Ratio',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppConstants.clinicalNavy),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -178,15 +196,15 @@ class AnalyticsScreen extends StatelessWidget {
                     Expanded(
                       flex: 68,
                       child: Container(
-                        height: 24,
+                        height: 28,
                         decoration: const BoxDecoration(
-                          color: AppConstants.tealPrimary,
+                          color: AppConstants.clinicalNavy,
                           borderRadius: BorderRadius.horizontal(left: Radius.circular(6)),
                         ),
                         child: const Center(
                           child: Text(
                             '68% Autoclave / Hydroclave',
-                            style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -194,7 +212,7 @@ class AnalyticsScreen extends StatelessWidget {
                     Expanded(
                       flex: 32,
                       child: Container(
-                        height: 24,
+                        height: 28,
                         decoration: const BoxDecoration(
                           color: AppConstants.amberWarning,
                           borderRadius: BorderRadius.horizontal(right: Radius.circular(6)),
@@ -202,7 +220,7 @@ class AnalyticsScreen extends StatelessWidget {
                         child: const Center(
                           child: Text(
                             '32% Incinerator',
-                            style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -210,11 +228,12 @@ class AnalyticsScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'By segregating at source via AI vision, incineration is minimized by 41%, significantly reducing hazardous dioxin emissions.',
+                const Text(
+                  'By segregating at source via AI vision, incineration is minimized by 41%, significantly reducing hazardous dioxin emissions and meeting CPCB 2016 standards.',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                    fontWeight: FontWeight.w400,
+                    color: AppConstants.textSecondary,
                     height: 1.35,
                   ),
                 ),
@@ -234,16 +253,20 @@ class AnalyticsScreen extends StatelessWidget {
     required String subtitle,
     required IconData icon,
     required Color color,
-    required bool isDark,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppConstants.surfaceSlate : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
-        ),
+        color: AppConstants.cardBg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +274,7 @@ class AnalyticsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: color, size: 22),
+              Icon(icon, color: color, size: 20),
               Container(
                 width: 6,
                 height: 6,
@@ -264,20 +287,22 @@ class AnalyticsScreen extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 24,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.5,
               color: color,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.5),
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.6, color: AppConstants.clinicalNavy),
           ),
           Text(
             subtitle,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 10,
-              color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+              fontWeight: FontWeight.w400,
+              color: AppConstants.textSecondary,
             ),
           ),
         ],
@@ -296,7 +321,7 @@ class AnalyticsScreen extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppConstants.textBody),
               ),
               Text(
                 '${Formatters.formatWeight(kg)} (${(ratio * 100).toStringAsFixed(0)}%)',
@@ -309,8 +334,8 @@ class AnalyticsScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: ratio,
-              minHeight: 6,
-              backgroundColor: const Color(0xFF334155).withOpacity(0.3),
+              minHeight: 8.0,
+              backgroundColor: AppConstants.surfaceInteractive,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
@@ -324,23 +349,21 @@ class AnalyticsScreen extends StatelessWidget {
 class _DailyTrendChartPainter extends CustomPainter {
   final List<double> dataPoints;
   final List<String> days;
-  final bool isDark;
 
   _DailyTrendChartPainter({
     required this.dataPoints,
     required this.days,
-    required this.isDark,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     const double bottomMargin = 24.0;
     final chartHeight = size.height - bottomMargin;
-    final maxVal = 20.0; // 20kg max scale
+    const maxVal = 20.0; // 20kg max scale
 
     // Draw baseline
     final baselinePaint = Paint()
-      ..color = (isDark ? AppConstants.borderSlate : const Color(0xFFCBD5E1))
+      ..color = AppConstants.dividerSubtle
       ..strokeWidth = 1.0;
     canvas.drawLine(Offset(0, chartHeight), Offset(size.width, chartHeight), baselinePaint);
 
@@ -358,7 +381,7 @@ class _DailyTrendChartPainter extends CustomPainter {
 
       // Draw bar with rounded top
       final barPaint = Paint()
-        ..color = isLast ? AppConstants.tealAccent : (isDark ? const Color(0xFF334155) : const Color(0xFF94A3B8))
+        ..color = isLast ? AppConstants.clinicalNavy : AppConstants.dividerSubtle
         ..style = PaintingStyle.fill;
 
       canvas.drawRRect(
@@ -376,7 +399,7 @@ class _DailyTrendChartPainter extends CustomPainter {
           style: TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.w700,
-            color: isLast ? AppConstants.tealAccent : AppConstants.neutralGrey,
+            color: isLast ? AppConstants.clinicalNavy : AppConstants.textSecondary,
           ),
         ),
         textDirection: TextDirection.ltr,
@@ -390,8 +413,8 @@ class _DailyTrendChartPainter extends CustomPainter {
           text: days[i],
           style: TextStyle(
             fontSize: 10,
-            fontWeight: isLast ? FontWeight.w800 : FontWeight.w500,
-            color: isLast ? AppConstants.tealAccent : AppConstants.neutralGrey,
+            fontWeight: isLast ? FontWeight.w700 : FontWeight.w500,
+            color: isLast ? AppConstants.clinicalNavy : AppConstants.textSecondary,
           ),
         ),
         textDirection: TextDirection.ltr,

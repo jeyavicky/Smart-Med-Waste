@@ -19,15 +19,15 @@ extension WasteCategoryExtension on WasteCategory {
   String get displayName {
     switch (this) {
       case WasteCategory.sharps:
-        return 'SHARPS (NEEDLES & BLADES)';
+        return AppConstants.sharpsLabel;
       case WasteCategory.infectious:
-        return 'INFECTIOUS BIOHAZARD';
+        return AppConstants.infectiousLabel;
       case WasteCategory.plastic:
-        return 'PLASTIC / RECYCLABLE';
+        return AppConstants.plasticLabel;
       case WasteCategory.glassware:
-        return 'GLASSWARE / CYTOTOXIC';
+        return AppConstants.glasswareLabel;
       case WasteCategory.unknownOthers:
-        return 'UNKNOWN / OTHERS (FALLBACK)';
+        return AppConstants.unknownLabel;
     }
   }
 

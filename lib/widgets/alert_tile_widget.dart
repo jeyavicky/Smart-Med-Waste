@@ -15,19 +15,24 @@ class AlertTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? AppConstants.surfaceSlate : Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: AppConstants.cardBg,
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: alert.isAcknowledged
-              ? (isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0))
+              ? AppConstants.cardBorder
               : alert.level.color.withOpacity(0.5),
           width: alert.isAcknowledged ? 1.0 : 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,10 +41,10 @@ class AlertTileWidget extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
-                  color: alert.level.color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6),
+                  color: alert.level.color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -50,7 +55,7 @@ class AlertTileWidget extends StatelessWidget {
                       alert.level.displayName,
                       style: TextStyle(
                         color: alert.level.color,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         fontSize: 10,
                         letterSpacing: 0.5,
                       ),
@@ -61,18 +66,18 @@ class AlertTileWidget extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 alert.relatedSubsystem,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
-                  color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                  color: AppConstants.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const Spacer(),
               Text(
                 Formatters.formatRelativeTime(alert.timestamp),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
-                  color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                  color: AppConstants.textSecondary,
                 ),
               ),
             ],
@@ -85,21 +90,21 @@ class AlertTileWidget extends StatelessWidget {
             alert.title,
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: 14,
+              fontSize: 13.5,
               color: alert.isAcknowledged
-                  ? (isDark ? AppConstants.lightSlate : Colors.black87)
-                  : (isDark ? Colors.white : Colors.black),
+                  ? AppConstants.textSecondary
+                  : AppConstants.clinicalNavy,
             ),
           ),
 
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
 
           // Message
           Text(
             alert.message,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
-              color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+              color: AppConstants.textBody,
               height: 1.35,
             ),
           ),
@@ -112,7 +117,7 @@ class AlertTileWidget extends StatelessWidget {
             children: [
               Text(
                 Formatters.formatDateTime(alert.timestamp),
-                style: const TextStyle(fontSize: 10, color: AppConstants.neutralGrey),
+                style: const TextStyle(fontSize: 10, color: AppConstants.coolSlate),
               ),
               if (!alert.isAcknowledged && onAcknowledge != null)
                 TextButton.icon(
@@ -127,11 +132,11 @@ class AlertTileWidget extends StatelessWidget {
               else
                 Row(
                   children: const [
-                    Icon(Icons.done_all_rounded, size: 14, color: Color(0xFF10B981)),
+                    Icon(Icons.done_all_rounded, size: 14, color: AppConstants.statusNominal),
                     SizedBox(width: 4),
                     Text(
                       'Acknowledged',
-                      style: TextStyle(fontSize: 11, color: Color(0xFF10B981), fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 11, color: AppConstants.statusNominal, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),

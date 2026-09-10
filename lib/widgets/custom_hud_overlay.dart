@@ -48,49 +48,34 @@ class _CustomHudOverlayState extends State<CustomHudOverlay>
 
         return Stack(
           children: [
-            // Background Simulated Camera Grid & Corner Reticles
+            // Background Clinical Inspection Grid & Calibration Reticles
             Positioned.fill(
               child: CustomPaint(
-                painter: _HudGridPainter(
+                painter: _ClinicalInspectionPainter(
                   sweepProgress: _sweepController.value,
-                  targetCategoryColor: widget.item.category.color,
+                  targetCategoryColor: widget.item.category.badgeColor,
                 ),
               ),
             ),
 
-            // Animated Scanner Sweep Line
+            // Precision Optical Scanning Line
             AnimatedBuilder(
               animation: _sweepController,
               builder: (context, child) {
                 final sweepY = boxTop + (_sweepController.value * boxHeight);
                 return Positioned(
-                  left: boxLeft - 10,
+                  left: boxLeft - 4,
                   top: sweepY,
-                  width: boxWidth + 20,
+                  width: boxWidth + 8,
                   child: Container(
-                    height: 2,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          widget.item.category.accentColor.withOpacity(0.0),
-                          widget.item.category.accentColor,
-                          widget.item.category.accentColor.withOpacity(0.0),
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: widget.item.category.accentColor.withOpacity(0.8),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
+                    height: 1.5,
+                    color: widget.item.category.badgeColor.withOpacity(0.85),
                   ),
                 );
               },
             ),
 
-            // Bounding Box with Corner Brackets & Glowing Aura
+            // Bounding Box with Clean Corner Brackets
             Positioned(
               left: boxLeft,
               top: boxTop,
@@ -98,7 +83,7 @@ class _CustomHudOverlayState extends State<CustomHudOverlay>
               height: boxHeight,
               child: CustomPaint(
                 painter: _CornerBracketPainter(
-                  color: widget.item.category.accentColor,
+                  color: widget.item.category.badgeColor,
                 ),
               ),
             ),
@@ -106,57 +91,51 @@ class _CustomHudOverlayState extends State<CustomHudOverlay>
             // Top-left Classification Badge
             Positioned(
               left: boxLeft,
-              top: (boxTop - 42).clamp(10.0, constraints.maxHeight - 50),
+              top: (boxTop - 36).clamp(8.0, constraints.maxHeight - 44),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0F172A).withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(6),
+                  color: const Color(0xFF0F172A),
+                  borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: widget.item.category.accentColor,
-                    width: 1.5,
+                    color: widget.item.category.badgeColor,
+                    width: 1.0,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.item.category.accentColor.withOpacity(0.4),
-                      blurRadius: 10,
-                    ),
-                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 8,
-                      height: 8,
+                      width: 6,
+                      height: 6,
                       decoration: BoxDecoration(
-                        color: widget.item.category.accentColor,
+                        color: widget.item.category.badgeColor,
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'AI: ${widget.item.detectedObject.toUpperCase()}',
+                      widget.item.detectedObject.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                       decoration: BoxDecoration(
-                        color: widget.item.category.color.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(4),
+                        color: widget.item.category.badgeColor.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(
                         '${(widget.item.confidence * 100).toStringAsFixed(1)}%',
                         style: TextStyle(
-                          color: widget.item.category.accentColor,
+                          color: widget.item.category.badgeColor,
                           fontSize: 10,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -168,14 +147,14 @@ class _CustomHudOverlayState extends State<CustomHudOverlay>
             // Bottom-left Sensor Tag: Weight & Diverter Gate
             Positioned(
               left: boxLeft,
-              top: (boxTop + boxHeight + 10).clamp(10.0, constraints.maxHeight - 65),
+              top: (boxTop + boxHeight + 8).clamp(8.0, constraints.maxHeight - 56),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0F172A).withOpacity(0.92),
-                  borderRadius: BorderRadius.circular(6),
+                  color: const Color(0xFF0F172A),
+                  borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: AppConstants.tealPrimary,
+                    color: const Color(0xFF334155),
                     width: 1.0,
                   ),
                 ),
@@ -185,40 +164,26 @@ class _CustomHudOverlayState extends State<CustomHudOverlay>
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.scale_rounded, color: AppConstants.tealAccent, size: 12),
+                        const Icon(Icons.scale_rounded, color: AppConstants.medicalTeal, size: 12),
                         const SizedBox(width: 4),
                         Text(
-                          'LOAD CELL: ${Formatters.formatWeight(widget.item.weightKg)}',
+                          'MASS: ${Formatters.formatWeight(widget.item.weightKg)}',
                           style: const TextStyle(
-                            color: AppConstants.tealAccent,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(Icons.radar_rounded, color: Color(0xFF38BDF8), size: 12),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'DEPTH: 42.4 cm',
-                          style: TextStyle(
-                            color: Color(0xFF38BDF8),
-                            fontSize: 10,
+                            color: Colors.white,
+                            fontSize: 9.5,
                             fontWeight: FontWeight.w600,
+                            letterSpacing: 0.4,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        const Icon(Icons.tune_rounded, color: AppConstants.amberWarning, size: 12),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.tune_rounded, color: AppConstants.coolSlate, size: 12),
                         const SizedBox(width: 4),
                         Text(
-                          'ROBOT ACTION: ${widget.item.category.compartmentGateId}',
+                          widget.item.category.compartmentGateId,
                           style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF94A3B8),
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -234,12 +199,12 @@ class _CustomHudOverlayState extends State<CustomHudOverlay>
   }
 }
 
-/// Custom painter for camera grid lines, center crosshairs, and corner marks
-class _HudGridPainter extends CustomPainter {
+/// Custom painter for clinical camera grid lines, center crosshairs, and corner marks
+class _ClinicalInspectionPainter extends CustomPainter {
   final double sweepProgress;
   final Color targetCategoryColor;
 
-  _HudGridPainter({
+  _ClinicalInspectionPainter({
     required this.sweepProgress,
     required this.targetCategoryColor,
   });
@@ -247,12 +212,12 @@ class _HudGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final gridPaint = Paint()
-      ..color = const Color(0xFF38BDF8).withOpacity(0.10)
-      ..strokeWidth = 1.0
+      ..color = Colors.white.withOpacity(0.06)
+      ..strokeWidth = 0.8
       ..style = PaintingStyle.stroke;
 
-    // Draw subtle grid
-    const double step = 40.0;
+    // Subtle calibration grid
+    const double step = 45.0;
     for (double x = 0; x < size.width; x += step) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
     }
@@ -262,22 +227,22 @@ class _HudGridPainter extends CustomPainter {
 
     // Center Crosshair
     final centerPaint = Paint()
-      ..color = targetCategoryColor.withOpacity(0.5)
-      ..strokeWidth = 1.5;
+      ..color = targetCategoryColor.withOpacity(0.4)
+      ..strokeWidth = 1.0;
 
     final center = Offset(size.width / 2, size.height / 2);
-    canvas.drawLine(Offset(center.dx - 15, center.dy), Offset(center.dx + 15, center.dy), centerPaint);
-    canvas.drawLine(Offset(center.dx, center.dy - 15), Offset(center.dx, center.dy + 15), centerPaint);
-    canvas.drawCircle(center, 24, gridPaint..color = targetCategoryColor.withOpacity(0.3));
+    canvas.drawLine(Offset(center.dx - 12, center.dy), Offset(center.dx + 12, center.dy), centerPaint);
+    canvas.drawLine(Offset(center.dx, center.dy - 12), Offset(center.dx, center.dy + 12), centerPaint);
+    canvas.drawCircle(center, 20, gridPaint..color = targetCategoryColor.withOpacity(0.25));
 
     // Outer Viewfinder Corner Markers
     final cornerPaint = Paint()
-      ..color = const Color(0xFF38BDF8).withOpacity(0.4)
-      ..strokeWidth = 2.0
+      ..color = Colors.white.withOpacity(0.35)
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
-    const cornerSize = 20.0;
-    const margin = 16.0;
+    const cornerSize = 16.0;
+    const margin = 14.0;
 
     // Top-left
     canvas.drawLine(const Offset(margin, margin), const Offset(margin + cornerSize, margin), cornerPaint);
@@ -293,11 +258,11 @@ class _HudGridPainter extends CustomPainter {
 
     // Bottom-right
     canvas.drawLine(Offset(size.width - margin, size.height - margin), Offset(size.width - margin - cornerSize, size.height - margin), cornerPaint);
-    canvas.drawLine(Offset(size.width - margin, size.height - margin), Offset(size.width - margin, size.height - margin - cornerSize), cornerPaint);
+    canvas.drawLine(Offset(size.width - margin, size.height - margin), Offset(size.width - margin, size.height - margin + cornerSize), cornerPaint);
   }
 
   @override
-  bool shouldRepaint(covariant _HudGridPainter oldDelegate) {
+  bool shouldRepaint(covariant _ClinicalInspectionPainter oldDelegate) {
     return oldDelegate.sweepProgress != sweepProgress ||
         oldDelegate.targetCategoryColor != targetCategoryColor;
   }
@@ -312,7 +277,7 @@ class _CornerBracketPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final borderPaint = Paint()
-      ..color = color.withOpacity(0.35)
+      ..color = color.withOpacity(0.3)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -321,11 +286,11 @@ class _CornerBracketPainter extends CustomPainter {
 
     final bracketPaint = Paint()
       ..color = color
-      ..strokeWidth = 3.0
+      ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.square;
 
-    final armLength = size.width * 0.18;
+    final armLength = size.width * 0.16;
 
     // Top-Left
     canvas.drawLine(const Offset(0, 0), Offset(armLength, 0), bracketPaint);

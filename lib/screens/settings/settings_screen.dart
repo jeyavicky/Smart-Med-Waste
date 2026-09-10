@@ -314,25 +314,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: (isDark ? const Color(0xFF131D31) : const Color(0xFFF1F5F9)),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Column(
-              children: [
-                const Text(
-                  'Smart India Hackathon (SIH 2024 / 2025 / 2026)',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                ),
-                const SizedBox(height: 2),
-                const Text(
-                  'Problem Statement PS 26115: Autonomous Biomedical Waste Collection Robot',
-                  style: TextStyle(fontSize: 11, color: AppConstants.neutralGrey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Client App ${AppConstants.appVersion} • Material 3',
-                  style: const TextStyle(fontSize: 10, color: AppConstants.lightSlate),
-                ),
-              ],
-            ),
           ),
 
           const SizedBox(height: 24),

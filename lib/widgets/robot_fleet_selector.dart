@@ -12,19 +12,16 @@ class RobotFleetSelector extends StatelessWidget {
     final robotProvider = context.watch<RobotProvider>();
     final fleet = robotProvider.fleet;
     final selectedId = robotProvider.selectedRobotId;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppConstants.surfaceSlate : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
-        ),
+        color: AppConstants.cardBg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppConstants.cardBorder, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(isDark ? 0.2 : 0.04),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -56,16 +53,16 @@ class RobotFleetSelector extends StatelessWidget {
                     'FLEET ORCHESTRATION',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.6,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.9,
                       color: AppConstants.clinicalNavy,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.12),
+                      color: AppConstants.statusNominal.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: const Text(
@@ -73,14 +70,15 @@ class RobotFleetSelector extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF10B981),
+                        letterSpacing: 0.5,
+                        color: AppConstants.statusNominal,
                       ),
                     ),
                   ),
                 ],
               ),
               Text(
-                'Selected: $selectedId',
+                'Active: $selectedId',
                 style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -92,63 +90,48 @@ class RobotFleetSelector extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Horizontal Carousel of 4 AMRs
+          // Horizontal Carousel of 4 AMRs Segmented Chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: fleet.map((bot) {
                 final isSelected = bot.id == selectedId;
                 return Padding(
-                  padding: const EdgeInsets.only(right: 10),
+                  padding: const EdgeInsets.only(right: 8),
                   child: InkWell(
                     onTap: () => robotProvider.selectRobot(bot.id),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(8),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
+                      duration: const Duration(milliseconds: 150),
                       width: 148,
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? (isDark
-                                ? AppConstants.tealPrimary.withOpacity(0.15)
-                                : const Color(0xFFF0FDFA))
-                            : (isDark
-                                ? const Color(0xFF131D31)
-                                : AppConstants.surfaceInteractive),
-                        borderRadius: BorderRadius.circular(14),
+                            ? AppConstants.clinicalNavy
+                            : AppConstants.surfaceInteractive,
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: isSelected
-                              ? AppConstants.medicalTeal
-                              : (isDark
-                                  ? AppConstants.borderSlate
-                                  : AppConstants.cardBorder),
-                          width: isSelected ? 2.0 : 1.0,
+                              ? AppConstants.clinicalNavy
+                              : AppConstants.dividerSubtle,
+                          width: 1.0,
                         ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: AppConstants.medicalTeal.withOpacity(0.15),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Top row: ID + Status Dot
+                          // Top row: ID + Status Indicator
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 bot.id,
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 14,
                                   color: isSelected
-                                      ? AppConstants.medicalTeal
-                                      : (isDark ? Colors.white : AppConstants.clinicalNavy),
+                                      ? Colors.white
+                                      : AppConstants.clinicalNavy,
                                 ),
                               ),
                               Container(
@@ -156,20 +139,24 @@ class RobotFleetSelector extends StatelessWidget {
                                 height: 8,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: bot.status.statusColor,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : bot.status.statusColor,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 4),
 
-                          // Short Ward Name
+                          // Ward Name
                           Text(
                             _formatWardShort(bot.assignedWard),
                             style: TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? AppConstants.lightSlate : AppConstants.textPrimary,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white.withOpacity(0.85)
+                                  : AppConstants.textSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -183,15 +170,20 @@ class RobotFleetSelector extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: bot.status.statusColor.withOpacity(0.14),
+                                  color: isSelected
+                                      ? Colors.white.withOpacity(0.18)
+                                      : bot.status.statusColor.withOpacity(0.12),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   _statusShort(bot.status),
                                   style: TextStyle(
-                                    fontSize: 8.5,
-                                    fontWeight: FontWeight.w800,
-                                    color: bot.status.statusColor,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.4,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : bot.status.statusColor,
                                   ),
                                 ),
                               ),
@@ -202,18 +194,22 @@ class RobotFleetSelector extends StatelessWidget {
                                     bot.batteryLevel > 20
                                         ? Icons.battery_charging_full_rounded
                                         : Icons.battery_alert_rounded,
-                                    size: 11,
-                                    color: bot.batteryLevel > 20
-                                        ? (isDark ? AppConstants.tealAccent : AppConstants.medicalTeal)
-                                        : AppConstants.crimsonDanger,
+                                    size: 12,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : (bot.batteryLevel > 20
+                                            ? AppConstants.medicalTeal
+                                            : AppConstants.crimsonDanger),
                                   ),
-                                  const SizedBox(width: 2),
+                                  const SizedBox(width: 3),
                                   Text(
                                     '${bot.batteryLevel}%',
                                     style: TextStyle(
                                       fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : AppConstants.textSecondary,
                                     ),
                                   ),
                                 ],

@@ -20,23 +20,24 @@ class WasteScreen extends StatelessWidget {
     final wasteProvider = context.watch<WasteAnalyticsProvider>();
     final robot = robotProvider.robot;
     final recentItems = wasteProvider.detectedItems;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: AppConstants.canvasBg,
       appBar: AppBar(
+        backgroundColor: AppConstants.cardBg,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Waste Segregation & Compartments',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppConstants.clinicalNavy),
             ),
             Text(
               'Active Node: ${robot.name} (${robot.id})',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                fontWeight: FontWeight.w400,
+                color: AppConstants.textSecondary,
               ),
             ),
           ],
@@ -44,7 +45,7 @@ class WasteScreen extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: 'CPCB Traceability Ledger',
-            icon: const Icon(Icons.receipt_long_rounded, color: AppConstants.medicalTeal),
+            icon: const Icon(Icons.receipt_long_outlined, color: AppConstants.clinicalNavy),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const HistoryScreen()),
@@ -59,7 +60,7 @@ class WasteScreen extends StatelessWidget {
           // Persistent Multi-Robot Fleet Selector
           const RobotFleetSelector(),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Launch Live AI Vision Banner
           InkWell(
@@ -68,36 +69,32 @@ class WasteScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const AiDetectionScreen()),
               );
             },
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(8),
             child: Container(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppConstants.clinicalNavy, Color(0xFF1E3A8A)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(18),
+                color: AppConstants.clinicalNavy,
+                borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: AppConstants.clinicalNavy.withOpacity(0.2),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppConstants.medicalTeal.withOpacity(0.25),
+                      color: Colors.white.withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
-                      Icons.camera_alt_rounded,
+                      Icons.camera_alt_outlined,
                       color: Colors.white,
-                      size: 26,
+                      size: 22,
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -109,44 +106,46 @@ class WasteScreen extends StatelessWidget {
                           'Open Onboard AI Vision HUD',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         SizedBox(height: 2),
                         Text(
-                          'Inspect real-time camera feed, targeting reticle & 5-way mechanical gating',
+                          'Camera feed, targeting reticle & 5-way mechanical diverters',
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 11,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
+                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
                 ],
               ),
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Anti-Contamination Feature Callout Card
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: isDark ? AppConstants.surfaceSlate : const Color(0xFFF3E8FF).withOpacity(0.6),
-              borderRadius: BorderRadius.circular(16),
+              color: AppConstants.unknownLightBg,
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: AppConstants.unknownBadge.withOpacity(0.3),
+                color: AppConstants.unknownBadge.withOpacity(0.35),
+                width: 1.0,
               ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: AppConstants.unknownBadge.withOpacity(0.12),
                     shape: BoxShape.circle,
@@ -157,25 +156,25 @@ class WasteScreen extends StatelessWidget {
                     size: 18,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
+                    children: const [
+                      Text(
                         'Anti-Contamination Chamber #5 Active',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           color: AppConstants.unknownBadge,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
                       Text(
-                        'Low-confidence or non-biomedical unrecognized items are diverted into the Unknown / Others compartment, preventing contamination of standard biomedical waste streams.',
+                        'Low-confidence or non-biomedical unrecognized items are diverted into Chamber #5 (General / Unclassified), preventing contamination of standard biomedical waste streams.',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isDark ? AppConstants.lightSlate : AppConstants.textPrimary,
+                          color: AppConstants.textBody,
                           height: 1.35,
                         ),
                       ),
@@ -186,7 +185,7 @@ class WasteScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
           // 5 Sealed Compartments Section Header
           Row(
@@ -198,18 +197,19 @@ class WasteScreen extends StatelessWidget {
                   children: [
                     Text(
                       '5 Standard Biomedical Compartments',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                        fontWeight: FontWeight.w700,
+                        color: AppConstants.clinicalNavy,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Load cells calibrated • Hermetic bio-seal active on ${robot.id}',
-                      style: TextStyle(
+                      'Strain gauge load cells calibrated • Hermetic bio-seal on ${robot.id}',
+                      style: const TextStyle(
                         fontSize: 11,
-                        color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                        fontWeight: FontWeight.w400,
+                        color: AppConstants.textSecondary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -219,13 +219,13 @@ class WasteScreen extends StatelessWidget {
               const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: () => wasteProvider.resetCompartments(),
-                icon: const Icon(Icons.restore_from_trash_rounded, size: 16),
-                label: const Text('EMPTY AT DOCK', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                icon: const Icon(Icons.restore_from_trash_outlined, size: 15),
+                label: const Text('EMPTY AT BAY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // 5 Compartment Bars of selected AMR
           ...robot.compartments.values.map(
@@ -246,12 +246,12 @@ class WasteScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Recent AI Segregation Logs',
                 style: TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                  fontWeight: FontWeight.w700,
+                  color: AppConstants.clinicalNavy,
                 ),
               ),
               TextButton(
@@ -274,14 +274,12 @@ class WasteScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? AppConstants.surfaceSlate : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
-                  ),
+                  color: AppConstants.cardBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppConstants.cardBorder, width: 1.0),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF0F172A).withOpacity(isDark ? 0.2 : 0.03),
+                      color: Colors.black.withOpacity(0.02),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -292,8 +290,9 @@ class WasteScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: item.category.badgeColor.withOpacity(0.12),
+                        color: item.category.lightBgColor,
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: item.category.badgeColor.withOpacity(0.3)),
                       ),
                       child: Icon(item.category.icon, color: item.category.badgeColor, size: 18),
                     ),
@@ -304,18 +303,19 @@ class WasteScreen extends StatelessWidget {
                         children: [
                           Text(
                             item.detectedObject,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 13,
-                              color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                              color: AppConstants.clinicalNavy,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             '${item.category.displayName} • ${Formatters.formatRelativeTime(item.timestamp)}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 11,
-                              color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                              fontWeight: FontWeight.w400,
+                              color: AppConstants.textSecondary,
                             ),
                           ),
                         ],
@@ -326,17 +326,18 @@ class WasteScreen extends StatelessWidget {
                       children: [
                         Text(
                           Formatters.formatWeight(item.weightKg),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
                             fontSize: 13,
-                            color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                            letterSpacing: -0.3,
+                            color: AppConstants.textPrimary,
                           ),
                         ),
                         Text(
                           '${(item.confidence * 100).toStringAsFixed(0)}% conf',
                           style: TextStyle(
                             fontSize: 10,
-                            color: item.confidence >= 0.7 ? const Color(0xFF10B981) : AppConstants.amberWarning,
+                            color: item.confidence >= 0.70 ? AppConstants.statusNominal : AppConstants.amberWarning,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -348,7 +349,7 @@ class WasteScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -361,7 +362,7 @@ class WasteScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(10),
           side: const BorderSide(color: AppConstants.cardBorder),
         ),
         title: Row(
@@ -372,13 +373,13 @@ class WasteScreen extends StatelessWidget {
                 color: comp.badgeColor.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.inventory_2_rounded, color: comp.badgeColor, size: 20),
+              child: const Icon(Icons.inventory_2_outlined, color: AppConstants.clinicalNavy, size: 20),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 comp.name,
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppConstants.clinicalNavy),
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppConstants.clinicalNavy),
               ),
             ),
           ],
@@ -387,19 +388,19 @@ class WasteScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _dialogRow('Chamber ID', comp.id.toUpperCase()),
+            _dialogRow('Chamber Stream', comp.id.toUpperCase()),
             _dialogRow('Current Load', '${Formatters.formatWeight(comp.currentWeightKg)} / ${comp.capacityKg} kg'),
-            _dialogRow('Fill Percentage', '${comp.fillPercentage}%'),
-            _dialogRow('Hermetic Bio-Seal', 'SECURE (Negative Pressure Differential)'),
-            _dialogRow('Internal Sterilizer', 'UV-C 254nm Tube Active'),
+            _dialogRow('Fill Ratio', '${comp.fillPercentage}%'),
+            _dialogRow('Hermetic Bio-Seal', 'SECURE (Differential Pressure Active)'),
+            _dialogRow('Disinfection Subsystem', 'UV-C 254nm Tube Active'),
           ],
         ),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppConstants.medicalTeal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              backgroundColor: AppConstants.clinicalNavy,
+              minimumSize: const Size(0, 40),
             ),
             child: const Text('DISMISS', style: TextStyle(fontWeight: FontWeight.w700)),
           ),
@@ -418,7 +419,7 @@ class WasteScreen extends StatelessWidget {
             width: 120,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 12, color: AppConstants.textSecondary, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 12, color: AppConstants.textSecondary, fontWeight: FontWeight.w500),
             ),
           ),
           Expanded(

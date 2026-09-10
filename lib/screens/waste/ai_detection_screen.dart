@@ -21,7 +21,7 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
     final provider = context.read<WasteAnalyticsProvider>();
     provider.simulateNextItem();
 
-    Future.delayed(const Duration(milliseconds: 150), () {
+    Future.delayed(const Duration(milliseconds: 120), () {
       if (mounted) setState(() => _isFlashing = false);
     });
   }
@@ -30,45 +30,48 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
   Widget build(BuildContext context) {
     final wasteProvider = context.watch<WasteAnalyticsProvider>();
     final currentItem = wasteProvider.currentItem;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isUnknownFallback = currentItem.category == WasteCategory.unknownOthers || currentItem.confidence < 0.70;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppConstants.canvasBg,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+        backgroundColor: AppConstants.cardBg,
         title: Row(
           children: [
             Container(
-              width: 10,
-              height: 10,
+              width: 8,
+              height: 8,
               decoration: const BoxDecoration(
-                color: Color(0xFFEF4444),
+                color: AppConstants.statusNominal,
                 shape: BoxShape.circle,
               ),
             ),
             const SizedBox(width: 8),
             const Text(
-              'LIVE AI VISION SCANNER (ONBOARD)',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 0.5, color: Colors.white),
+              'CLINICAL AI INSPECTION PORTAL',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+                color: AppConstants.clinicalNavy,
+              ),
             ),
           ],
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withOpacity(0.2),
+              color: AppConstants.clinicalNavy.withOpacity(0.08),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: const Color(0xFF10B981)),
+              border: Border.all(color: AppConstants.clinicalNavy.withOpacity(0.2)),
             ),
             child: const Center(
               child: Text(
-                '45 FPS • TensorRT',
+                '45 FPS • TensorRT Edge',
                 style: TextStyle(
-                  color: Color(0xFF10B981),
+                  color: AppConstants.clinicalNavy,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
@@ -79,72 +82,70 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
       ),
       body: Column(
         children: [
-          // Camera Viewfinder Box
+          // Clinical Camera Inspection Viewport Box
           Expanded(
             flex: 6,
-            child: Stack(
-              children: [
-                // Simulated Camera Video Frame Background (Chamber interior look)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        center: Alignment.center,
-                        radius: 0.85,
-                        colors: [
-                          const Color(0xFF1E293B),
-                          const Color(0xFF0F172A),
-                          Colors.black.withOpacity(0.95),
-                        ],
-                      ),
-                    ),
-                    child: Center(
-                      child: Opacity(
-                        opacity: 0.15,
-                        child: Icon(
-                          currentItem.category.icon,
-                          size: 160,
-                          color: currentItem.category.color,
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F172A), // Certified dark high-contrast optical chamber
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppConstants.cardBorder, width: 1.0),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Stack(
+                  children: [
+                    // Simulated Item Backdrop
+                    Positioned.fill(
+                      child: Center(
+                        child: Opacity(
+                          opacity: 0.12,
+                          child: Icon(
+                            currentItem.category.icon,
+                            size: 150,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
 
-                // HUD Targeting Overlay
-                Positioned.fill(
-                  child: CustomHudOverlay(item: currentItem),
-                ),
-
-                // Shutter flash effect
-                if (_isFlashing)
-                  Positioned.fill(
-                    child: Container(color: Colors.white.withOpacity(0.4)),
-                  ),
-
-                // Top Sensor Telemetry Floating Bar
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.75),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white24),
+                    // HUD Targeting Overlay
+                    Positioned.fill(
+                      child: CustomHudOverlay(item: currentItem),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _hudStat('ISO 400', 'EXPOSURE: 1/120s'),
-                        _hudStat('FOV: 110°', 'LIDAR: SYNCED'),
-                        _hudStat('STERILIZATION', 'UV-C READY'),
-                      ],
+
+                    // Shutter flash effect
+                    if (_isFlashing)
+                      Positioned.fill(
+                        child: Container(color: Colors.white.withOpacity(0.35)),
+                      ),
+
+                    // Top Sensor Telemetry Floating Bar
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.65),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.white12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _hudStat('OPTICAL', 'SONY IMX335 5MP'),
+                            _hudStat('LIDAR DEPTH', 'ACTIVE SLAM'),
+                            _hudStat('UV-C DECONTAM', 'ARMED'),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
 
@@ -152,18 +153,16 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
           Expanded(
             flex: 5,
             child: Container(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? AppConstants.surfaceSlate : Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                border: Border.all(
-                  color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
-                ),
+                color: AppConstants.cardBg,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                border: Border.all(color: AppConstants.cardBorder, width: 1.0),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0F172A).withOpacity(0.08),
-                    blurRadius: 16,
-                    offset: const Offset(0, -4),
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, -3),
                   ),
                 ],
               ),
@@ -178,18 +177,18 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                         decoration: BoxDecoration(
                           color: AppConstants.unknownLightBg,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppConstants.unknownBadge.withOpacity(0.4)),
+                          border: Border.all(color: AppConstants.unknownBadge.withOpacity(0.5)),
                         ),
                         child: Row(
                           children: [
                             const Icon(Icons.shield_rounded, size: 16, color: AppConstants.unknownBadge),
                             const SizedBox(width: 8),
-                            Expanded(
+                            const Expanded(
                               child: Text(
-                                'ANTI-CONTAMINATION: Low confidence (<70%) or unclassified item automatically routed to Gate #5 (Unknown/Others Fallback)',
-                                style: const TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w700,
+                                'ANTI-CONTAMINATION: Unclassified/Low-Confidence item (<70%) automatically diverted to Gate #5 (General / Unclassified Vault)',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
                                   color: AppConstants.unknownBadge,
                                 ),
                               ),
@@ -207,26 +206,26 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: currentItem.category.lightBgColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: currentItem.category.badgeColor),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: currentItem.category.badgeColor, width: 1.0),
                           ),
                           child: Icon(
                             currentItem.category.icon,
                             color: currentItem.category.badgeColor,
-                            size: 24,
+                            size: 22,
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 currentItem.detectedObject,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
-                                  fontWeight: FontWeight.w800,
-                                  color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppConstants.clinicalNavy,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -236,23 +235,24 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                                     currentItem.category.displayName,
                                     style: TextStyle(
                                       color: currentItem.category.badgeColor,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                                     decoration: BoxDecoration(
                                       color: currentItem.category.badgeColor.withOpacity(0.12),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      '${(currentItem.confidence * 100).toStringAsFixed(1)}% Confidence',
+                                      '${(currentItem.confidence * 100).toStringAsFixed(1)}% Conf',
                                       style: TextStyle(
                                         color: currentItem.category.badgeColor,
-                                        fontSize: 10.5,
-                                        fontWeight: FontWeight.w800,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                   ),
@@ -266,71 +266,71 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                           children: [
                             Text(
                               Formatters.formatWeight(currentItem.weightKg),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 letterSpacing: -0.5,
-                                color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                                color: AppConstants.textPrimary,
                               ),
                             ),
-                            Text(
+                            const Text(
                               'Load Cell Mass',
-                              style: TextStyle(fontSize: 11, color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary),
+                              style: TextStyle(fontSize: 11, color: AppConstants.textSecondary),
                             ),
                           ],
                         ),
                       ],
                     ),
 
-                    const Divider(height: 20),
+                    const SizedBox(height: 12),
+                    const Divider(),
+                    const SizedBox(height: 12),
 
                     // Target Compartment & Protocol Details
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF131D31) : AppConstants.surfaceInteractive,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
-                        ),
+                        color: AppConstants.surfaceInteractive,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppConstants.cardBorder),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.swap_calls_rounded, size: 18, color: currentItem.category.badgeColor),
-                              const SizedBox(width: 8),
+                              Icon(Icons.swap_calls_rounded, size: 16, color: currentItem.category.badgeColor),
+                              const SizedBox(width: 6),
                               Text(
                                 'TARGET: ${currentItem.category.compartmentGateId.toUpperCase()}',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 11,
                                   color: currentItem.category.badgeColor,
-                                  letterSpacing: 0.5,
+                                  letterSpacing: 0.6,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 4),
                           Text(
                             'Actuator Directives: ${currentItem.internalActionDetails}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 11.5,
-                              color: isDark ? AppConstants.lightSlate : AppConstants.textPrimary,
+                              color: AppConstants.textBody,
                               height: 1.3,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(Icons.fingerprint_rounded, size: 14, color: AppConstants.textSecondary),
+                              const Icon(Icons.fingerprint_rounded, size: 13, color: AppConstants.textSecondary),
                               const SizedBox(width: 4),
                               Text(
-                                'CPCB Blockchain Hash: ${currentItem.verificationHash ?? "0x0000000000000000"}',
+                                'CPCB Blockchain Verification: ${currentItem.verificationHash ?? "0x0000000000000000"}',
                                 style: const TextStyle(
                                   fontSize: 10,
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'monospace',
                                   color: AppConstants.textSecondary,
                                 ),
                               ),
@@ -348,8 +348,8 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: _triggerSimulatedScan,
-                            icon: const Icon(Icons.skip_next_rounded, size: 16),
-                            label: const Text('SAMPLE NEXT ITEM', style: TextStyle(fontSize: 11.5)),
+                            icon: const Icon(Icons.skip_next_rounded, size: 18),
+                            label: const Text('SAMPLE NEXT ITEM'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -360,15 +360,15 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    '${currentItem.detectedObject} deposited to ${currentItem.category.shortName} compartment & logged to ledger.',
+                                    '${currentItem.detectedObject} deposited to ${currentItem.category.shortName} chamber & logged to CPCB manifest.',
                                   ),
                                   behavior: SnackBarBehavior.floating,
                                   backgroundColor: AppConstants.clinicalNavy,
                                 ),
                               );
                             },
-                            icon: const Icon(Icons.check_circle_rounded, size: 16),
-                            label: const Text('CONFIRM & DIVERT', style: TextStyle(fontSize: 11.5)),
+                            icon: const Icon(Icons.check_circle_rounded, size: 18),
+                            label: const Text('CONFIRM & DIVERT'),
                           ),
                         ),
                       ],
@@ -396,14 +396,14 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 1),
         Text(
           value,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 10,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.3,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.4,
           ),
         ),
       ],
