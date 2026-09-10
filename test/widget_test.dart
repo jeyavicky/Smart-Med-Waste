@@ -78,6 +78,68 @@ void main() {
     expect(find.text('CPCB COMPLIANCE'), findsOneWidget);
   });
 
+  testWidgets('Waste screen View All Ledger opens CPCB Traceability Ledger screen', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SmartMedWasteApp());
+    await tester.pump();
+
+    // Switch to Waste screen
+    await tester.tap(find.text('Waste'));
+    await tester.pumpAndSettle();
+
+    // Tap View All Ledger
+    final viewAllBtn = find.text('View All Ledger');
+    expect(viewAllBtn, findsOneWidget);
+    await tester.tap(viewAllBtn);
+    await tester.pumpAndSettle();
+
+    // Verify Ledger Screen opened without crashing and shows CPCB title & entries
+    expect(find.text('CPCB Regulatory Traceability Ledger'), findsOneWidget);
+    expect(find.text('#CW-1024'), findsOneWidget);
+    expect(find.text('Sharps'), findsWidgets);
+  });
+
+  testWidgets('Tracking screen switches robot, shows dynamic ID, destination and steps route', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SmartMedWasteApp());
+    await tester.pump();
+
+    // Tap Corridor Map quick action button on Dashboard
+    final mapBtn = find.text('Corridor Map');
+    expect(mapBtn, findsOneWidget);
+    await tester.tap(mapBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(find.text('Hospital Autonomous Transit Map'), findsOneWidget);
+    expect(find.textContaining('Target: Central Bio Disposal'), findsOneWidget);
+
+    // Switch to R02 in active screen's Fleet Selector
+    await tester.tap(find.text('R02').last);
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // Verify R02 target destination and route steps are displayed
+    expect(find.textContaining('Target: Central Incineration Bay'), findsOneWidget);
+    expect(find.text('1. OT Complex 03'), findsOneWidget);
+
+    // Step transit
+    await tester.tap(find.text('STEP TRANSIT').last);
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // Verify transit state updated
+    expect(find.text('TRANSIT / EN ROUTE'), findsOneWidget);
+  });
+
+
+
   testWidgets('Navigation bar switches to Settings screen', (WidgetTester tester) async {
     await tester.pumpWidget(const SmartMedWasteApp());
     await tester.pump();
@@ -89,3 +151,4 @@ void main() {
     expect(find.text('Demo Simulation Engine (SIH Judges)'), findsOneWidget);
   });
 }
+

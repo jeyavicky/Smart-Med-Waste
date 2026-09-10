@@ -82,6 +82,7 @@ class MockDataService {
         id: 'R01',
         name: 'Sanitation Rover 1',
         assignedWard: 'ICU Wing (Floor 2)',
+        destination: 'Central Bio Disposal (Basement)',
         status: RobotStatus.collecting,
         batteryLevel: 88,
         voltage: 12.2,
@@ -89,9 +90,9 @@ class MockDataService {
         aiCameraActive: true,
         currentAmps: 2.1,
         coordinates: const RobotCoordinates(
-          x: 120.0,
-          y: 85.0,
-          headingDegrees: 45.0,
+          x: 75.0,
+          y: 65.0,
+          headingDegrees: 0.0,
           floor: 'Floor 2 (ICU Wing)',
         ),
         compartments: create5Compartments(
@@ -108,6 +109,7 @@ class MockDataService {
         id: 'R02',
         name: 'Sanitation Rover 2',
         assignedWard: 'Surgery / OT Block (Floor 3)',
+        destination: 'Central Incineration Bay (Basement)',
         status: RobotStatus.enRoute,
         batteryLevel: 74,
         voltage: 12.0,
@@ -115,9 +117,9 @@ class MockDataService {
         aiCameraActive: true,
         currentAmps: 3.4,
         coordinates: const RobotCoordinates(
-          x: 180.0,
-          y: 110.0,
-          headingDegrees: 90.0,
+          x: 235.0,
+          y: 65.0,
+          headingDegrees: 180.0,
           floor: 'Floor 3 (OT Block)',
         ),
         compartments: create5Compartments(
@@ -134,6 +136,7 @@ class MockDataService {
         id: 'R03',
         name: 'Sanitation Rover 3',
         assignedWard: 'Central Waste Bay (Basement)',
+        destination: 'Disinfection Dock 03 (Basement)',
         status: RobotStatus.docked,
         batteryLevel: 96,
         voltage: 13.8,
@@ -159,7 +162,8 @@ class MockDataService {
       RobotModel(
         id: 'R04',
         name: 'Sanitation Rover 4',
-        assignedWard: 'General Ward 3 (Floor 1)',
+        assignedWard: 'Pathology Lab (Floor 1)',
+        destination: 'Pathology Bio-Seal Chute (Level 1)',
         status: RobotStatus.idle,
         batteryLevel: 82,
         voltage: 12.1,
@@ -167,10 +171,10 @@ class MockDataService {
         aiCameraActive: true,
         currentAmps: 1.4,
         coordinates: const RobotCoordinates(
-          x: 75.0,
-          y: 65.0,
+          x: 65.0,
+          y: 225.0,
           headingDegrees: 0.0,
-          floor: 'Floor 1 (General Ward 3)',
+          floor: 'Floor 1 (Pathology Lab)',
         ),
         compartments: create5Compartments(
           sharpsKg: 1.20,

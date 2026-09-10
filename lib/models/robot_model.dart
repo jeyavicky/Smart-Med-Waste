@@ -202,6 +202,8 @@ class RobotModel {
   final DateTime lastHeartbeat;
   final bool isOnline;
 
+  final String destination;
+
   RobotModel({
     required this.id,
     required this.name,
@@ -212,6 +214,7 @@ class RobotModel {
     required this.temperatureC,
     required this.compartments,
     required this.aiCameraActive,
+    this.destination = 'Central Bio Disposal (Basement)',
     this.currentAmps = 1.8,
     this.coordinates = const RobotCoordinates(x: 120.0, y: 85.0, headingDegrees: 45.0),
     this.health = const SubsystemHealth(),
@@ -235,6 +238,7 @@ class RobotModel {
     String? id,
     String? name,
     String? assignedWard,
+    String? destination,
     RobotStatus? status,
     int? batteryLevel,
     double? voltage,
@@ -251,6 +255,7 @@ class RobotModel {
       id: id ?? this.id,
       name: name ?? this.name,
       assignedWard: assignedWard ?? this.assignedWard,
+      destination: destination ?? this.destination,
       status: status ?? this.status,
       batteryLevel: batteryLevel ?? this.batteryLevel,
       voltage: voltage ?? this.voltage,
@@ -265,3 +270,16 @@ class RobotModel {
     );
   }
 }
+
+class RobotRouteStep {
+  final String title;
+  final String subtitle;
+  final RobotCoordinates coordinates;
+
+  const RobotRouteStep({
+    required this.title,
+    required this.subtitle,
+    required this.coordinates,
+  });
+}
+

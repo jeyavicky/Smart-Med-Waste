@@ -27,12 +27,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppConstants.darkSlate : AppConstants.canvasBg,
       appBar: AppBar(
-        title: const Text('CPCB Regulatory Traceability Ledger'),
+        title: const Text(
+          'CPCB Regulatory Traceability Ledger',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+        ),
         actions: [
           IconButton(
             tooltip: 'Export CPCB Audit Report',
-            icon: const Icon(Icons.file_download_rounded, color: AppConstants.tealAccent),
+            icon: const Icon(Icons.file_download_rounded, color: AppConstants.medicalTeal),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -51,13 +55,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             color: isDark ? const Color(0xFF131D31) : const Color(0xFFF1F5F9),
             child: Row(
-              children: const [
-                Icon(Icons.verified_rounded, color: Color(0xFF10B981), size: 18),
-                SizedBox(width: 8),
+              children: [
+                const Icon(Icons.verified_rounded, color: Color(0xFF10B981), size: 18),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Bio-Medical Waste Management Rules 2016 Compliant • Barcode Verification Active',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppConstants.lightSlate : AppConstants.clinicalNavy,
+                    ),
                   ),
                 ),
               ],
@@ -107,15 +115,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           label: Text(ward),
                           selected: isSelected,
                           onSelected: (_) => analyticsProvider.setSelectedWardFilter(ward),
-                          selectedColor: AppConstants.tealPrimary.withOpacity(0.35),
+                          selectedColor: AppConstants.medicalTeal.withOpacity(0.25),
                           labelStyle: TextStyle(
                             fontSize: 11,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected ? Colors.white : AppConstants.lightSlate,
+                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                            color: isSelected
+                                ? (isDark ? Colors.white : AppConstants.clinicalNavy)
+                                : (isDark ? AppConstants.lightSlate : AppConstants.textSecondary),
                           ),
-                          backgroundColor: Theme.of(context).cardColor,
+                          backgroundColor: isDark ? AppConstants.surfaceSlate : Colors.white,
                           side: BorderSide(
-                            color: isSelected ? AppConstants.tealAccent : AppConstants.borderSlate,
+                            color: isSelected ? AppConstants.medicalTeal : (isDark ? AppConstants.borderSlate : AppConstants.cardBorder),
                           ),
                         ),
                       );
@@ -126,7 +136,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
 
-          const Divider(),
+          const Divider(height: 1),
 
           // Audit Ledger List
           Expanded(
@@ -137,9 +147,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       children: [
                         const Icon(Icons.receipt_long_rounded, size: 48, color: AppConstants.neutralGrey),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'No Matching Collection Records',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -168,19 +182,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildLedgerCard(BuildContext context, Map<String, dynamic> item, bool isDark) {
-    final breakdown = item['breakdown'] as Map<String, dynamic>;
+    final breakdown = (item['breakdown'] as Map<String, dynamic>?) ?? {};
+
+    final double sharps = (breakdown['sharpsKg'] as num?)?.toDouble() ?? 0.0;
+    final double infectious = (breakdown['infectiousKg'] as num?)?.toDouble() ?? 0.0;
+    final double plastic = (breakdown['plasticKg'] as num?)?.toDouble() ?? 0.0;
+    final double glassware = (breakdown['glasswareKg'] as num?)?.toDouble() ?? 0.0;
+    final double others = ((breakdown['unknownOthersKg'] ?? breakdown['otherKg']) as num?)?.toDouble() ?? 0.0;
 
     return InkWell(
-      onTap: () => _showAuditDetailsDialog(context, item),
-      borderRadius: BorderRadius.circular(16),
+      onTap: () => _showAuditDetailsDialog(context, item, isDark),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isDark ? AppConstants.surfaceSlate : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
+            color: isDark ? AppConstants.borderSlate : AppConstants.cardBorder,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withOpacity(isDark ? 0.25 : 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,14 +218,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppConstants.tealPrimary.withOpacity(0.15),
+                    color: AppConstants.medicalTeal.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppConstants.tealPrimary.withOpacity(0.4)),
+                    border: Border.all(color: AppConstants.medicalTeal.withOpacity(0.3)),
                   ),
                   child: Text(
                     '#${item['id']}',
                     style: const TextStyle(
-                      color: AppConstants.tealAccent,
+                      color: AppConstants.medicalTeal,
                       fontWeight: FontWeight.w800,
                       fontSize: 12,
                     ),
@@ -207,8 +234,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    item['ward'],
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    item['ward'] ?? 'Hospital Ward',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                      color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -219,7 +250,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    item['status'],
+                    item['status'] ?? 'VERIFIED',
                     style: const TextStyle(
                       color: Color(0xFF10B981),
                       fontWeight: FontWeight.w800,
@@ -244,38 +275,44 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       Formatters.formatDateTime(item['timestamp']),
                       style: TextStyle(
                         fontSize: 11,
-                        color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
+                        color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                       ),
                     ),
                   ],
                 ),
                 Text(
                   '${Formatters.formatWeight(item['totalWeightKg'])} (${item['itemCount']} items)',
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                    color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                  ),
                 ),
               ],
             ),
 
             const SizedBox(height: 10),
-            const Divider(),
+            const Divider(height: 1),
             const SizedBox(height: 8),
 
-            // 4-Category Breakdown Mini Badges
+            // Standardized 5-Compartment Breakdown Mini Badges
             Row(
               children: [
-                _categoryChip('Sharps', breakdown['sharpsKg'], AppConstants.sharpsAccent),
-                const SizedBox(width: 6),
-                _categoryChip('Infectious', breakdown['infectiousKg'], AppConstants.infectiousColor),
-                const SizedBox(width: 6),
-                _categoryChip('Plastic', breakdown['plasticKg'], AppConstants.plasticColor),
-                const SizedBox(width: 6),
-                _categoryChip('Other', breakdown['otherKg'], AppConstants.otherColor),
+                _categoryChip('Sharps', sharps, AppConstants.sharpsBadge, isDark),
+                const SizedBox(width: 4),
+                _categoryChip('Infectious', infectious, AppConstants.infectiousBadge, isDark),
+                const SizedBox(width: 4),
+                _categoryChip('Plastic', plastic, AppConstants.plasticBadge, isDark),
+                const SizedBox(width: 4),
+                _categoryChip('Glass', glassware, AppConstants.glasswareBadge, isDark),
+                const SizedBox(width: 4),
+                _categoryChip('Other', others, AppConstants.unknownBadge, isDark),
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            // Robot Verification Token
+            // Robot ID & Verification Token
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -284,16 +321,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     const Icon(Icons.fingerprint_rounded, size: 13, color: AppConstants.neutralGrey),
                     const SizedBox(width: 4),
                     Text(
-                      'Token: ${Formatters.formatToken(item['token'])}',
-                      style: const TextStyle(
-                        fontSize: 11,
+                      'AMR: ${item['robotId'] ?? 'R01'} • ${Formatters.formatToken(item['token'])}',
+                      style: TextStyle(
+                        fontSize: 10,
                         fontFamily: 'monospace',
-                        color: AppConstants.lightSlate,
+                        color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
                       ),
                     ),
                   ],
                 ),
-                const Icon(Icons.qr_code_2_rounded, size: 18, color: AppConstants.tealAccent),
+                const Icon(Icons.qr_code_2_rounded, size: 18, color: AppConstants.medicalTeal),
               ],
             ),
           ],
@@ -302,7 +339,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget _categoryChip(String label, double kg, Color color) {
+  Widget _categoryChip(String label, num? kg, Color color, bool isDark) {
+    final double safeKg = (kg ?? 0.0).toDouble();
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
@@ -314,12 +353,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           children: [
             Text(
               label,
-              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: color),
+              style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: color),
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              '${kg.toStringAsFixed(2)}kg',
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
+              '${safeKg.toStringAsFixed(2)}kg',
+              style: TextStyle(
+                fontSize: 9.5,
+                fontWeight: FontWeight.w800,
+                color: isDark ? Colors.white : AppConstants.clinicalNavy,
+              ),
             ),
           ],
         ),
@@ -327,16 +370,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  void _showAuditDetailsDialog(BuildContext context, Map<String, dynamic> item) {
+  void _showAuditDetailsDialog(BuildContext context, Map<String, dynamic> item, bool isDark) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppConstants.surfaceSlate,
+        backgroundColor: isDark ? AppConstants.surfaceSlate : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             const Icon(Icons.verified_user_rounded, color: Color(0xFF10B981)),
             const SizedBox(width: 8),
-            Text('Collection #${item['id']} Verification'),
+            Expanded(
+              child: Text(
+                'Collection #${item['id']} Verification',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                ),
+              ),
+            ),
           ],
         ),
         content: SingleChildScrollView(
@@ -344,29 +397,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Ward: ${item['ward']}'),
-              const SizedBox(height: 4),
-              Text('Disposal Facility: ${item['facility']}'),
-              const SizedBox(height: 4),
-              Text('Operator: ${item['operator']}'),
-              const SizedBox(height: 4),
-              Text('Compliance Code: ${item['complianceStatus']}'),
+              _detailRow('Ward / Dept', item['ward'] ?? 'N/A', isDark),
+              _detailRow('AMR Node', item['robotId'] ?? 'R01', isDark),
+              _detailRow('Disposal Facility', item['facility'] ?? 'N/A', isDark),
+              _detailRow('Operator', item['operator'] ?? 'N/A', isDark),
+              _detailRow('Compliance Code', item['complianceStatus'] ?? 'CPCB Verified', isDark),
               const SizedBox(height: 12),
               const Divider(),
               const SizedBox(height: 8),
-              const Center(
-                child: Icon(Icons.qr_code_2_rounded, size: 100, color: Colors.white),
-              ),
-              const Center(
-                child: Text(
-                  'CPCB Scan Validated',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.qr_code_2_rounded,
+                    size: 90,
+                    color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
+              const Center(
+                child: Text(
+                  'CPCB Scan Validated • Secure Manifest',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                ),
+              ),
+              const SizedBox(height: 10),
               Text(
                 'Cryptographic Signature:\n${item['token']}',
-                style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppConstants.lightSlate),
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontFamily: 'monospace',
+                  color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                ),
               ),
             ],
           ),
@@ -374,7 +441,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CLOSE'),
+            child: const Text('CLOSE', style: TextStyle(fontWeight: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : AppConstants.clinicalNavy,
+              ),
+            ),
           ),
         ],
       ),

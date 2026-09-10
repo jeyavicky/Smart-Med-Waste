@@ -158,25 +158,27 @@ class DashboardScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '5-Chamber Waste Levels (${robot.id})',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                        color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '5-Chamber Waste Levels (${robot.id})',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          color: isDark ? Colors.white : AppConstants.clinicalNavy,
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Internal hermetic isolation • Strain gauge load cells (±1g)',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                      Text(
+                        'Internal hermetic isolation • Strain gauge load cells (±1g)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark ? AppConstants.lightSlate : AppConstants.textSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
