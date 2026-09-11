@@ -5,16 +5,55 @@ import 'package:google_fonts/google_fonts.dart';
 /// Sage, Muted Slate & Soft Frost clinical design system
 class AppTheme {
   // Core Nordic Palette Tokens
-  static const Color scaffoldBg = Color(0xFFF0F4F8); // Soft Ice Grey / Frost Canvas
-  static const Color surfaceCard = Color(0xFFE6ECEF); // Soft Mint Surface Tint
-  static const Color surfacePorcelain = Color(0xFFEBF1F5); // Muted Porcelain
+  static const Color scaffoldBg = Color(0xFFF0F4F8); // Nordic Canvas
+  static const Color surfaceCard = Color(0xFFE6ECEF); // Surface Card
+  static const Color surfacePorcelain = Color(0xFFEBF1F5); // Porcelain
   static const Color pearlWhite = Color(0xFFF7FAFC); // Clean Pearl White
-  static const Color primaryTeal = Color(0xFF0A4D52); // Deep Forest Teal
-  static const Color accentTeal = Color(0xFF1B7A82); // Nordic Cyan
+  static const Color primaryTeal = Color(0xFF0A4D52); // Deep Nordic Teal
+  static const Color accentTeal = Color(0xFF1B7A82); // Nordic Interactive Accent
   static const Color sageEmerald = Color(0xFF2E856E); // Soft Emerald / Sage
-  static const Color borderSubtle = Color(0xFFD2DCE5); // Subtle Deep Slate Accent (1.2px)
-  static const Color textMain = Color(0xFF16252D); // Graphite Dark Slate
-  static const Color textMuted = Color(0xFF4F6470); // Deep Steel Grey
+  static const Color borderSubtle = Color(0xFFD2DCE5); // Border (1.2px)
+  static const Color textMain = Color(0xFF16252D); // High-contrast primary text
+  static const Color textMuted = Color(0xFF4F6470); // Deep Steel Muted text
+
+  // 5 Internal Compartment Tokens (Text/Icon on Background)
+  // 1. Sharps (#37474F on #E8EDF2)
+  static const Color sharpsColor = Color(0xFF37474F);
+  static const Color sharpsBg = Color(0xFFE8EDF2);
+
+  // 2. Infectious (#B7791F on #FFF3CD)
+  static const Color infectiousColor = Color(0xFFB7791F);
+  static const Color infectiousBg = Color(0xFFFFF3CD);
+
+  // 3. Plastic (#C53030 on #FFE8E6)
+  static const Color plasticColor = Color(0xFFC53030);
+  static const Color plasticBg = Color(0xFFFFE8E6);
+
+  // 4. Glassware (#2B6CB0 on #E1EEFF)
+  static const Color glasswareColor = Color(0xFF2B6CB0);
+  static const Color glasswareBg = Color(0xFFE1EEFF);
+
+  // 5. Unknown/Others (#6B46C1 on #EFE7FA)
+  static const Color unknownColor = Color(0xFF6B46C1);
+  static const Color unknownBg = Color(0xFFEFE7FA);
+
+  static (Color foreground, Color background) getCompartmentColors(String compartment) {
+    switch (compartment.toLowerCase()) {
+      case 'sharps':
+        return (sharpsColor, sharpsBg);
+      case 'infectious':
+        return (infectiousColor, infectiousBg);
+      case 'plastic':
+        return (plasticColor, plasticBg);
+      case 'glassware':
+      case 'glass':
+        return (glasswareColor, glasswareBg);
+      case 'unknown':
+      case 'others':
+      default:
+        return (unknownColor, unknownBg);
+    }
+  }
 
   static ThemeData get nordicClinicalTheme {
     final baseText = ThemeData.light().textTheme;

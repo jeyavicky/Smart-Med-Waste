@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/constants/app_constants.dart';
+import '../core/theme/app_theme.dart';
 
 enum WasteCategory {
   sharps,
@@ -19,15 +19,15 @@ extension WasteCategoryExtension on WasteCategory {
   String get displayName {
     switch (this) {
       case WasteCategory.sharps:
-        return AppConstants.sharpsLabel;
+        return 'SHARPS / NEEDLES';
       case WasteCategory.infectious:
-        return AppConstants.infectiousLabel;
+        return 'INFECTIOUS BIO-WASTE';
       case WasteCategory.plastic:
-        return AppConstants.plasticLabel;
+        return 'NON-CHLORINATED PLASTIC';
       case WasteCategory.glassware:
-        return AppConstants.glasswareLabel;
+        return 'GLASSWARE / VIALS';
       case WasteCategory.unknownOthers:
-        return AppConstants.unknownLabel;
+        return 'UNKNOWN / GENERAL RESIDUE';
     }
   }
 
@@ -42,7 +42,7 @@ extension WasteCategoryExtension on WasteCategory {
       case WasteCategory.glassware:
         return 'Glassware';
       case WasteCategory.unknownOthers:
-        return 'Unknown/Other';
+        return 'Unknown';
     }
   }
 
@@ -51,48 +51,47 @@ extension WasteCategoryExtension on WasteCategory {
       case WasteCategory.sharps:
         return 'Gate #1 (Sharps Vault)';
       case WasteCategory.infectious:
-        return 'Gate #2 (Biohazard Bio-Lock)';
+        return 'Gate #2 (Infectious Bio-Lock)';
       case WasteCategory.plastic:
         return 'Gate #3 (Plastic Diverter)';
       case WasteCategory.glassware:
         return 'Gate #4 (Glassware Chute)';
       case WasteCategory.unknownOthers:
-        return 'Gate #5 (Fallback Containment)';
+        return 'Gate #5 (Fallback Vault)';
     }
   }
 
   Color get color {
     switch (this) {
       case WasteCategory.sharps:
-        return AppConstants.sharpsBadge;
+        return AppTheme.sharpsColor;
       case WasteCategory.infectious:
-        return AppConstants.infectiousBadge;
+        return AppTheme.infectiousColor;
       case WasteCategory.plastic:
-        return AppConstants.plasticBadge;
+        return AppTheme.plasticColor;
       case WasteCategory.glassware:
-        return AppConstants.glasswareBadge;
+        return AppTheme.glasswareColor;
       case WasteCategory.unknownOthers:
-        return AppConstants.unknownBadge;
+        return AppTheme.unknownColor;
     }
   }
 
   Color get lightBgColor {
     switch (this) {
       case WasteCategory.sharps:
-        return AppConstants.sharpsLightBg;
+        return AppTheme.sharpsBg;
       case WasteCategory.infectious:
-        return AppConstants.infectiousLightBg;
+        return AppTheme.infectiousBg;
       case WasteCategory.plastic:
-        return AppConstants.plasticLightBg;
+        return AppTheme.plasticBg;
       case WasteCategory.glassware:
-        return AppConstants.glasswareLightBg;
+        return AppTheme.glasswareBg;
       case WasteCategory.unknownOthers:
-        return AppConstants.unknownLightBg;
+        return AppTheme.unknownBg;
     }
   }
 
   Color get badgeColor => color;
-
   Color get accentColor => color;
 
   IconData get icon {
@@ -136,6 +135,10 @@ class WasteItemModel {
   final NormalizedRect boundingBox;
   final String wardId;
   final String? verificationHash;
+  final String operatorId;
+  final bool isManualOverride;
+  final double riskScore; // 0.0 to 1.0
+  final bool isDiverterLocked;
 
   const WasteItemModel({
     required this.id,
@@ -148,7 +151,13 @@ class WasteItemModel {
     this.boundingBox = const NormalizedRect(left: 0.22, top: 0.28, width: 0.56, height: 0.44),
     this.wardId = 'ICU-01',
     this.verificationHash,
+    this.operatorId = 'OP-042',
+    this.isManualOverride = false,
+    this.riskScore = 0.85,
+    this.isDiverterLocked = true,
   });
+
+  bool get isHighConfidence => confidence >= 0.80;
 
   WasteItemModel copyWith({
     String? id,
@@ -161,6 +170,10 @@ class WasteItemModel {
     NormalizedRect? boundingBox,
     String? wardId,
     String? verificationHash,
+    String? operatorId,
+    bool? isManualOverride,
+    double? riskScore,
+    bool? isDiverterLocked,
   }) {
     return WasteItemModel(
       id: id ?? this.id,
@@ -173,6 +186,10 @@ class WasteItemModel {
       boundingBox: boundingBox ?? this.boundingBox,
       wardId: wardId ?? this.wardId,
       verificationHash: verificationHash ?? this.verificationHash,
+      operatorId: operatorId ?? this.operatorId,
+      isManualOverride: isManualOverride ?? this.isManualOverride,
+      riskScore: riskScore ?? this.riskScore,
+      isDiverterLocked: isDiverterLocked ?? this.isDiverterLocked,
     );
   }
 }

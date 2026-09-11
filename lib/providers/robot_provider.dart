@@ -342,8 +342,11 @@ class RobotProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  static bool enablePeriodicTimer = true;
+
   void _startTelemetryLoop() {
     _telemetryTicker?.cancel();
+    if (!enablePeriodicTimer) return;
     if (_simulationSpeed == 0.0) return; // Paused
 
     final intervalMs = (2500 / _simulationSpeed).round().clamp(500, 5000);

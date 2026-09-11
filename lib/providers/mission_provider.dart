@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 import '../models/mission_model.dart';
 import '../models/robot_model.dart';
 import '../services/mock_data_service.dart';
-import '../services/mqtt_service.dart';
-import '../core/constants/api_constants.dart';
+import '../services/websocket_service.dart';
 import 'robot_provider.dart';
 
 class MissionProvider extends ChangeNotifier {
   final MockDataService _dataService = MockDataService.instance;
-  final MqttService _mqttService = SimulatedMqttService.instance;
+  final WebSocketService _wsService = WebSocketService();
 
   MissionModel? _activeMission;
   final List<MissionModel> _missionHistory = [];
-  Timer? _missionLifecycleTimer;
+  Timer? _lifecycleTicker;
 
   MissionProvider() {
     _activeMission = _dataService.getInitialMission();
@@ -25,105 +24,111 @@ class MissionProvider extends ChangeNotifier {
 
   bool get hasActiveMission =>
       _activeMission != null &&
-      _activeMission!.status != MissionStatus.completed &&
-      _activeMission!.status != MissionStatus.cancelled;
+      _activeMission!.status != MissionLifecycleStatus.completed &&
+      _activeMission!.status != MissionLifecycleStatus.cancelled;
 
-  /// Initiates a new pickup request from clinical staff
+  /// Requests a collection mission and initiates 11-step lifecycle
   Future<bool> requestPickup({
     required String department,
     required String stationId,
     required MissionPriority priority,
     required String notes,
     required RobotProvider robotProvider,
+    String assignedRobotId = 'R01',
   }) async {
-    final missionId = 'MIS-2026-${(100 + _missionHistory.length)}';
-    final newMission = MissionModel(
+    final missionId = 'MSN-${DateTime.now().year}-${(100 + _missionHistory.length)}';
+    final mission = MissionModel(
       missionId: missionId,
       department: department,
       stationId: stationId,
+      assignedRobotId: assignedRobotId,
       priority: priority,
-      status: MissionStatus.dispatched,
-      requestedBy: 'Nurse Station Incharge (Staff ID #204)',
+      status: MissionLifecycleStatus.pending,
+      requestedBy: 'Clinical Ward Officer',
       requestedAt: DateTime.now(),
       notes: notes,
       routeWaypoints: [
-        'Dock Bay Alpha',
-        'Corridor B East',
-        'Ward Airlock',
+        'Docking Bay',
+        'Corridor West',
+        'Bio-Airlock 2',
         stationId,
+        'Basement Elevator',
+        'Central Disposal Bay',
       ],
-      estimatedArrivalMins: priority == MissionPriority.emergencyBiologicalSpill ? 1.2 : 3.0,
+      estimatedArrivalMins: priority == MissionPriority.emergencyBiologicalSpill ? 1.0 : 3.0,
     );
 
-    _activeMission = newMission;
-    _missionHistory.insert(0, newMission);
-
-    // Publish MQTT dispatch handshake
-    await _mqttService.publish(ApiConstants.topicMissionCreate, {
-      'missionId': missionId,
-      'department': department,
-      'stationId': stationId,
-      'priority': priority.name,
-      'notes': notes,
-      'timestamp': DateTime.now().toIso8601String(),
-    });
-
-    // Update robot status
-    robotProvider.updateStatus(RobotStatus.navigatingToWard, wardName: stationId);
+    _activeMission = mission;
+    _missionHistory.insert(0, mission);
     notifyListeners();
 
-    // Start simulated progression cycle
-    _startSimulatedProgression(robotProvider);
-
+    // Start 11-Step Lifecycle progression
+    _runFullLifecycle(robotProvider, assignedRobotId, stationId);
     return true;
   }
 
-  /// Automatically progresses the mission through realistic hospital transit states
-  void _startSimulatedProgression(RobotProvider robotProvider) {
-    _missionLifecycleTimer?.cancel();
+  void _runFullLifecycle(RobotProvider robotProvider, String robotId, String destination) {
+    _lifecycleTicker?.cancel();
 
-    // Stage 1: Arrived at ward, segregating (after 4s)
-    _missionLifecycleTimer = Timer(const Duration(seconds: 4), () {
-      if (_activeMission == null || _activeMission!.status == MissionStatus.cancelled) return;
+    // 11 stages sequence:
+    // PENDING (0s) -> ASSIGNED (1.5s) -> DISPATCHED (3s) -> EN_ROUTE (5s) ->
+    // ARRIVED (8s) -> COLLECTING (11s) -> ANALYZING (14s) -> SEGREGATING (17s) ->
+    // RETURNING (20s) -> DISPOSAL (23s) -> COMPLETED (26s)
 
-      _activeMission = _activeMission!.copyWith(status: MissionStatus.collecting);
-      robotProvider.updateStatus(RobotStatus.segregatingWaste);
-      notifyListeners();
+    final stages = [
+      (MissionLifecycleStatus.assigned, 1500, 'Assigned to Rover $robotId'),
+      (MissionLifecycleStatus.dispatched, 1500, 'Dispatched from docking bay'),
+      (MissionLifecycleStatus.enRoute, 2000, 'En route to $destination'),
+      (MissionLifecycleStatus.arrived, 3000, 'Arrived at $destination'),
+      (MissionLifecycleStatus.collecting, 3000, 'Collecting biomedical bags'),
+      (MissionLifecycleStatus.analyzing, 3000, 'Analyzing with YOLO AI Vision'),
+      (MissionLifecycleStatus.segregating, 3000, 'Segregating into internal vaults'),
+      (MissionLifecycleStatus.returning, 3000, 'Returning to Central Bay'),
+      (MissionLifecycleStatus.disposal, 3000, 'Discharging at Disposal Bay'),
+      (MissionLifecycleStatus.completed, 3000, 'Mission successfully completed'),
+    ];
 
-      // Stage 2: Waste segregated, returning to central disposal (after 5s)
-      _missionLifecycleTimer = Timer(const Duration(seconds: 5), () {
-        if (_activeMission == null || _activeMission!.status == MissionStatus.cancelled) return;
+    void advanceStage(int index) {
+      if (index >= stages.length) return;
+      if (_activeMission == null || _activeMission!.status == MissionLifecycleStatus.cancelled) return;
 
-        _activeMission = _activeMission!.copyWith(status: MissionStatus.returning);
-        robotProvider.updateStatus(
-          RobotStatus.returningToDisposal,
-          wardName: 'Basement Central Facility',
+      final stage = stages[index];
+      _lifecycleTicker = Timer(Duration(milliseconds: stage.$2), () {
+        if (_activeMission == null || _activeMission!.status == MissionLifecycleStatus.cancelled) return;
+
+        final newStatus = stage.$1;
+        _activeMission = _activeMission!.copyWith(
+          status: newStatus,
+          completedAt: newStatus == MissionLifecycleStatus.completed ? DateTime.now() : null,
         );
+
+        // Update robot status
+        if (newStatus == MissionLifecycleStatus.enRoute) {
+          robotProvider.updateStatus(RobotStatus.enRoute, wardName: destination);
+        } else if (newStatus == MissionLifecycleStatus.collecting ||
+            newStatus == MissionLifecycleStatus.analyzing ||
+            newStatus == MissionLifecycleStatus.segregating) {
+          robotProvider.updateStatus(RobotStatus.collecting, wardName: destination);
+        } else if (newStatus == MissionLifecycleStatus.returning) {
+          robotProvider.updateStatus(RobotStatus.discharging, wardName: 'Central Bay');
+        } else if (newStatus == MissionLifecycleStatus.completed) {
+          robotProvider.updateStatus(RobotStatus.idle, wardName: 'Docking Bay');
+        }
+
+        _wsService.broadcastMissionUpdate(_activeMission!);
         notifyListeners();
 
-        // Stage 3: Completed deposit at central autoclave/incinerator (after 5s)
-        _missionLifecycleTimer = Timer(const Duration(seconds: 5), () {
-          if (_activeMission == null || _activeMission!.status == MissionStatus.cancelled) return;
-
-          _activeMission = _activeMission!.copyWith(
-            status: MissionStatus.completed,
-            completedAt: DateTime.now(),
-          );
-          robotProvider.updateStatus(
-            RobotStatus.idle,
-            wardName: 'Dock Bay Alpha (Floor 2)',
-          );
-          notifyListeners();
-        });
+        advanceStage(index + 1);
       });
-    });
+    }
+
+    advanceStage(0);
   }
 
-  /// Cancels the current active mission
   void cancelActiveMission(RobotProvider robotProvider) {
-    _missionLifecycleTimer?.cancel();
+    _lifecycleTicker?.cancel();
     if (_activeMission != null) {
-      _activeMission = _activeMission!.copyWith(status: MissionStatus.cancelled);
+      _activeMission = _activeMission!.copyWith(status: MissionLifecycleStatus.cancelled);
       robotProvider.updateStatus(RobotStatus.idle);
       notifyListeners();
     }
@@ -131,7 +136,7 @@ class MissionProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _missionLifecycleTimer?.cancel();
+    _lifecycleTicker?.cancel();
     super.dispose();
   }
 }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/app_constants.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
-import '../admin_navigation_wrapper.dart';
-import '../staff_navigation_wrapper.dart';
+import '../core_navigation_shell.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,16 +12,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController(text: 'admin@hospital.org');
+  final _identifierController = TextEditingController(text: 'admin@hospital.org');
   final _passwordController = TextEditingController(text: 'password123');
+  bool _obscurePassword = true;
 
-  Future<void> _login({String? email, String? password}) async {
-    if (email != null) _emailController.text = email;
+  Future<void> _login({String? identifier, String? password}) async {
+    if (identifier != null) _identifierController.text = identifier;
     if (password != null) _passwordController.text = password;
 
     final auth = context.read<AuthProvider>();
     await auth.login(
-      _emailController.text.trim(),
+      _identifierController.text.trim(),
       _passwordController.text,
     );
 
@@ -32,186 +32,214 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(auth.error!),
-          backgroundColor: AppConstants.crimsonDanger,
+          backgroundColor: AppTheme.plasticColor,
         ),
       );
     } else if (auth.isAuthenticated && auth.currentUser != null) {
-      if (auth.currentUser!.role == 'admin') {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AdminNavigationWrapper()),
-        );
-      } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const StaffNavigationWrapper()),
-        );
-      }
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const CoreNavigationShell()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: AppTheme.scaffoldBg,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
+              constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // App Brand Logo / Icon
+                  // App Brand Logo
                   Center(
                     child: Container(
-                      width: 76,
-                      height: 76,
+                      width: 72,
+                      height: 72,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [AppConstants.tealPrimary, Color(0xFF0F766E)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        color: AppTheme.primaryTeal,
+                        borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: AppConstants.tealPrimary.withOpacity(0.35),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
+                            color: AppTheme.primaryTeal.withOpacity(0.18),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: const Icon(
-                        Icons.smart_toy_rounded,
+                        Icons.local_hospital_rounded,
                         color: Colors.white,
-                        size: 40,
+                        size: 38,
                       ),
                     ),
                   ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'SMART MED-WASTE',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: AppTheme.primaryTeal,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Autonomous Bio-Hazard Segregation & AMR Fleet Management',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textMuted,
+                          fontSize: 12,
+                        ),
+                  ),
+                  const SizedBox(height: 28),
 
+                  // Login Card Container
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(22),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'CLINICAL PORTAL ACCESS',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.primaryTeal,
+                                  letterSpacing: 0.8,
+                                ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Email or Phone Input
+                          Text(
+                            'Work Email or Registered Phone',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.textMain,
+                                ),
+                          ),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _identifierController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: const InputDecoration(
+                              hintText: 'e.g. staff@hospital.org or +919876543211',
+                              prefixIcon: Icon(Icons.person_outline_rounded, color: AppTheme.primaryTeal, size: 20),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Password Input
+                          Text(
+                            'Secure Password',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.textMain,
+                                ),
+                          ),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            decoration: InputDecoration(
+                              hintText: 'Enter password',
+                              prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppTheme.primaryTeal, size: 20),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                                  color: AppTheme.textMuted,
+                                  size: 18,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+
+                          // Submit Button
+                          ElevatedButton(
+                            onPressed: auth.isLoading ? null : () => _login(),
+                            child: auth.isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('AUTHENTICATE & ENTER PORTAL'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
 
-                  // Title & Tagline
-                  const Center(
-                    child: Text(
-                      AppConstants.appName,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Center(
-                    child: Text(
-                      'AI Autonomous Medical Waste Segregation',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Login Form Card
-                  Container(
-                    padding: const EdgeInsets.all(22),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppConstants.surfaceSlate : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isDark ? AppConstants.borderSlate : const Color(0xFFE2E8F0),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          'Secure Login',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 16),
-
-                        TextField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            labelText: 'Email Address',
-                            prefixIcon: Icon(Icons.email_outlined, size: 20),
+                  // Quick Fill Demo Credentials (No manual role toggling on UI)
+                  Card(
+                    color: AppTheme.surfacePorcelain,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'QUICK DEMO CREDENTIALS (NO ROLE TOGGLE)',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textMuted,
+                              letterSpacing: 0.5,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 14),
-
-                        TextField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: Icon(Icons.lock_outline_rounded, size: 20),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    minimumSize: const Size(0, 36),
+                                  ),
+                                  onPressed: () => _login(
+                                    identifier: 'admin@hospital.org',
+                                    password: 'password123',
+                                  ),
+                                  child: const Text('Admin Officer', style: TextStyle(fontSize: 11)),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    minimumSize: const Size(0, 36),
+                                  ),
+                                  onPressed: () => _login(
+                                    identifier: 'staff@hospital.org',
+                                    password: 'password123',
+                                  ),
+                                  child: const Text('Clinical Staff', style: TextStyle(fontSize: 11)),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        ElevatedButton.icon(
-                          onPressed: auth.isLoading ? null : _login,
-                          icon: auth.isLoading 
-                              ? const SizedBox(
-                                  width: 16, 
-                                  height: 16, 
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
-                                ) 
-                              : const Icon(Icons.login_rounded),
-                          label: Text(auth.isLoading ? 'AUTHENTICATING...' : 'LOGIN'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  Center(
-                    child: Text(
-                      'QUICK DEMO ACCESS (SIH JUDGING)',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  OutlinedButton.icon(
-                    onPressed: auth.isLoading
-                        ? null
-                        : () => _login(email: 'admin@hospital.org', password: 'password123'),
-                    icon: const Icon(Icons.admin_panel_settings_rounded, size: 18),
-                    label: const Text('Login as Hospital Admin (Dr. Ramanujam)'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      side: BorderSide(
-                        color: isDark ? AppConstants.borderSlate : const Color(0xFFCBD5E1),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  OutlinedButton.icon(
-                    onPressed: auth.isLoading
-                        ? null
-                        : () => _login(email: 'staff@hospital.org', password: 'password123'),
-                    icon: const Icon(Icons.medical_services_rounded, size: 18),
-                    label: const Text('Login as ICU Ward Staff (Nurse Sunita)'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      side: BorderSide(
-                        color: isDark ? AppConstants.borderSlate : const Color(0xFFCBD5E1),
+                        ],
                       ),
                     ),
                   ),

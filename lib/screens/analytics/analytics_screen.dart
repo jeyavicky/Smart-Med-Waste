@@ -1,431 +1,288 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/utils/formatters.dart';
-import '../../providers/waste_analytics_provider.dart';
+import '../../core/theme/app_theme.dart';
+import '../../providers/analytics_provider.dart';
 
 class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final analytics = context.watch<WasteAnalyticsProvider>();
+    final analytics = context.watch<AnalyticsProvider>();
 
     return Scaffold(
-      backgroundColor: AppConstants.canvasBg,
       appBar: AppBar(
-        backgroundColor: AppConstants.cardBg,
-        title: const Text(
-          'Waste Generation & Compliance Analytics',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppConstants.clinicalNavy),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Top KPI Scores Row
-          Row(
-            children: [
-              Expanded(
-                child: _kpiCard(
-                  title: 'CPCB COMPLIANCE',
-                  value: '${analytics.cpcbComplianceScore}%',
-                  subtitle: 'Bio-rules 2016 audited',
-                  icon: Icons.verified_user_rounded,
-                  color: AppConstants.statusNominal,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _kpiCard(
-                  title: 'AI SEGREGATION ACCURACY',
-                  value: '${analytics.segregationAccuracy}%',
-                  subtitle: 'Computer Vision 45 FPS',
-                  icon: Icons.auto_awesome_rounded,
-                  color: AppConstants.medicalTeal,
-                ),
-              ),
-            ],
+        title: const Text('ANALYTICS & CPCB REGULATORY LEDGER'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf_rounded, color: AppTheme.primaryTeal),
+            tooltip: 'Export CPCB PDF Manifest',
+            onPressed: () async {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Generating Regulatory Manifest PDF...')),
+              );
+              await analytics.exportManifestPdf();
+            },
           ),
-
-          const SizedBox(height: 14),
-
-          // Daily Generation 7-Day Trend Chart Card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppConstants.cardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppConstants.cardBorder, width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Top KPI Row
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMetricCard(
+                    title: 'CPCB COMPLIANCE',
+                    value: '${analytics.cpcbComplianceRate}%',
+                    subtitle: 'Rule 2016 Audit Pass',
+                    icon: Icons.verified_user_rounded,
+                    color: AppTheme.sageEmerald,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildMetricCard(
+                    title: 'AI SEGREGATION',
+                    value: '${analytics.aiSegregationAccuracy}%',
+                    subtitle: 'YOLO Computer Vision',
+                    icon: Icons.psychology_rounded,
+                    color: AppTheme.primaryTeal,
+                  ),
                 ),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            const SizedBox(height: 16),
+
+            // 5-Compartment Weight Breakdown Card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Daily Waste Generation (Past 7 Days)',
-                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppConstants.clinicalNavy),
-                        ),
-                        Text(
-                          'Total: 101.4 kg • Peak: 16.75 kg (Today)',
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          '5-COMPARTMENT WEIGHT ALLOCATION',
                           style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.w400,
-                            color: AppConstants.textSecondary,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.6,
+                            color: AppTheme.primaryTeal,
+                          ),
+                        ),
+                        Text(
+                          'Total: ${analytics.totalMonthlyBiomedicalKg} kg',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textMain,
                           ),
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppConstants.statusNominal.withOpacity(0.10),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        '+8.4% Today',
-                        style: TextStyle(
-                          color: AppConstants.statusNominal,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ),
+                    const SizedBox(height: 14),
+                    _buildCompartmentBar('Sharps (Needles/Blades)', 86.4, 482.6, AppTheme.sharpsColor, AppTheme.sharpsBg),
+                    _buildCompartmentBar('Infectious (Yellow Bags)', 194.2, 482.6, AppTheme.infectiousColor, AppTheme.infectiousBg),
+                    _buildCompartmentBar('Plastic (Red Non-Chlorinated)', 118.5, 482.6, AppTheme.plasticColor, AppTheme.plasticBg),
+                    _buildCompartmentBar('Glassware (Vials/Ampoules)', 58.0, 482.6, AppTheme.glasswareColor, AppTheme.glasswareBg),
+                    _buildCompartmentBar('Unknown / Others', 25.5, 482.6, AppTheme.unknownColor, AppTheme.unknownBg),
                   ],
                 ),
-                const SizedBox(height: 20),
-
-                // Custom Canvas Bar Chart
-                SizedBox(
-                  height: 160,
-                  child: CustomPaint(
-                    painter: _DailyTrendChartPainter(
-                      dataPoints: const [11.2, 14.8, 12.4, 16.1, 13.9, 15.2, 16.75],
-                      days: const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
-                    ),
-                    child: const SizedBox.expand(),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
 
-          const SizedBox(height: 14),
-
-          // 5-Category Biomedical Waste Distribution
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppConstants.cardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppConstants.cardBorder, width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Biomedical Waste Category Share (Cumulative)',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppConstants.clinicalNavy),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Automated color-coded segregation across 5 sealed internal chambers',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                    color: AppConstants.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                _categoryShareRow('Infectious / Pathological (Yellow)', 19.60, 0.51, AppConstants.infectiousBadge),
-                _categoryShareRow('Contaminated Plastics (Red)', 9.68, 0.25, AppConstants.plasticBadge),
-                _categoryShareRow('Sharps / Blades (White)', 3.94, 0.10, AppConstants.sharpsBadge),
-                _categoryShareRow('Glassware & Vials (Blue)', 3.67, 0.10, AppConstants.glasswareBadge),
-                _categoryShareRow('General / Unclassified (Fallback)', 1.50, 0.04, AppConstants.unknownBadge),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          // Treatment Facility Routing Breakdown
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppConstants.cardBg,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppConstants.cardBorder, width: 1.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Hospital Central Treatment Disposal Ratio',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppConstants.clinicalNavy),
-                ),
-                const SizedBox(height: 12),
-                Row(
+            // 7-Day Biomedical Waste Volume Trend
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      flex: 68,
-                      child: Container(
-                        height: 28,
-                        decoration: const BoxDecoration(
-                          color: AppConstants.clinicalNavy,
-                          borderRadius: BorderRadius.horizontal(left: Radius.circular(6)),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            '68% Autoclave / Hydroclave',
-                            style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
-                          ),
-                        ),
+                    const Text(
+                      '7-DAY GENERATION TREND (KG / DAY)',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.6,
+                        color: AppTheme.primaryTeal,
                       ),
                     ),
-                    Expanded(
-                      flex: 32,
-                      child: Container(
-                        height: 28,
-                        decoration: const BoxDecoration(
-                          color: AppConstants.amberWarning,
-                          borderRadius: BorderRadius.horizontal(right: Radius.circular(6)),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            '32% Incinerator',
-                            style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
-                          ),
-                        ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 130,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          _buildTrendBar('Mon', 62.4, 100),
+                          _buildTrendBar('Tue', 71.0, 100),
+                          _buildTrendBar('Wed', 58.5, 100),
+                          _buildTrendBar('Thu', 79.0, 100),
+                          _buildTrendBar('Fri', 68.2, 100),
+                          _buildTrendBar('Sat', 84.1, 100),
+                          _buildTrendBar('Sun', 59.4, 100),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                const Text(
-                  'By segregating at source via AI vision, incineration is minimized by 41%, significantly reducing hazardous dioxin emissions and meeting CPCB 2016 standards.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppConstants.textSecondary,
-                    height: 1.35,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
 
-          const SizedBox(height: 24),
-        ],
+            // Regulatory Manifest Generation Action
+            Card(
+              color: AppTheme.surfacePorcelain,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.gavel_rounded, size: 20, color: AppTheme.primaryTeal),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'REGULATORY CPCB MANIFEST EXPORT',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primaryTeal,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Generate tamper-evident digital consignment form (Form IV) including 5-vault weight ledger, SHA-256 custody hash, and authorized officer signatures.',
+                      style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                    ),
+                    const SizedBox(height: 14),
+                    ElevatedButton.icon(
+                      onPressed: () => analytics.exportManifestPdf(),
+                      icon: const Icon(Icons.file_download_rounded, size: 18),
+                      label: const Text('EXPORT REGULATORY PDF MANIFEST'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _kpiCard({
+  Widget _buildMetricCard({
     required String title,
     required String value,
     required String subtitle,
     required IconData icon,
     required Color color,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppConstants.cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppConstants.cardBorder, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, color: color, size: 20),
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textMuted,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Icon(icon, size: 18, color: color),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: color,
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.5,
-              color: color,
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.6, color: AppConstants.clinicalNavy),
-          ),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w400,
-              color: AppConstants.textSecondary,
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _categoryShareRow(String label, double kg, double ratio, Color color) {
+  Widget _buildCompartmentBar(String name, double kg, double totalKg, Color fg, Color bg) {
+    final pct = (kg / totalKg);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                label,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppConstants.textBody),
-              ),
-              Text(
-                '${Formatters.formatWeight(kg)} (${(ratio * 100).toStringAsFixed(0)}%)',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
-              ),
+              Text(name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: fg)),
+              Text('${kg.toStringAsFixed(1)} kg (${(pct * 100).toStringAsFixed(0)}%)',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
             ],
           ),
-          const SizedBox(height: 5),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: ratio,
-              minHeight: 8.0,
-              backgroundColor: AppConstants.surfaceInteractive,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-            ),
+          const SizedBox(height: 4),
+          LinearProgressIndicator(
+            value: pct,
+            backgroundColor: bg,
+            valueColor: AlwaysStoppedAnimation<Color>(fg),
+            minHeight: 6,
+            borderRadius: BorderRadius.circular(3),
           ),
         ],
       ),
     );
   }
-}
 
-/// Custom Canvas Painter for the 7-day daily trend bar chart
-class _DailyTrendChartPainter extends CustomPainter {
-  final List<double> dataPoints;
-  final List<String> days;
-
-  _DailyTrendChartPainter({
-    required this.dataPoints,
-    required this.days,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const double bottomMargin = 24.0;
-    final chartHeight = size.height - bottomMargin;
-    const maxVal = 20.0; // 20kg max scale
-
-    // Draw baseline
-    final baselinePaint = Paint()
-      ..color = AppConstants.dividerSubtle
-      ..strokeWidth = 1.0;
-    canvas.drawLine(Offset(0, chartHeight), Offset(size.width, chartHeight), baselinePaint);
-
-    final numBars = dataPoints.length;
-    final totalBarArea = size.width / numBars;
-    final barWidth = totalBarArea * 0.45;
-
-    for (int i = 0; i < numBars; i++) {
-      final val = dataPoints[i];
-      final barHeight = (val / maxVal) * (chartHeight - 20);
-      final x = (i * totalBarArea) + (totalBarArea - barWidth) / 2;
-      final y = chartHeight - barHeight;
-
-      final isLast = i == numBars - 1;
-
-      // Draw bar with rounded top
-      final barPaint = Paint()
-        ..color = isLast ? AppConstants.clinicalNavy : AppConstants.dividerSubtle
-        ..style = PaintingStyle.fill;
-
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(x, y, barWidth, barHeight),
-          const Radius.circular(4),
+  Widget _buildTrendBar(String day, double value, double maxValue) {
+    final heightRatio = (value / maxValue).clamp(0.1, 1.0);
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              '${value.toInt()}',
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.textMain),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              height: 75 * heightRatio,
+              decoration: BoxDecoration(
+                color: AppTheme.accentTeal,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              day,
+              style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+            ),
+          ],
         ),
-        barPaint,
-      );
-
-      // Value label on top of bar
-      final valPainter = TextPainter(
-        text: TextSpan(
-          text: '${val.toStringAsFixed(1)}k',
-          style: TextStyle(
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-            color: isLast ? AppConstants.clinicalNavy : AppConstants.textSecondary,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-
-      valPainter.paint(canvas, Offset(x + (barWidth - valPainter.width) / 2, y - 14));
-
-      // Day label below baseline
-      final dayPainter = TextPainter(
-        text: TextSpan(
-          text: days[i],
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: isLast ? FontWeight.w700 : FontWeight.w500,
-            color: isLast ? AppConstants.clinicalNavy : AppConstants.textSecondary,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-
-      dayPainter.paint(canvas, Offset(x + (barWidth - dayPainter.width) / 2, chartHeight + 6));
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DailyTrendChartPainter oldDelegate) {
-    return false;
+      ),
+    );
   }
 }

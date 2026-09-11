@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/constants/app_constants.dart';
+import '../core/theme/app_theme.dart';
 
 enum AlertLevel {
   critical,
@@ -22,11 +22,11 @@ extension AlertLevelExtension on AlertLevel {
   Color get color {
     switch (this) {
       case AlertLevel.critical:
-        return AppConstants.crimsonDanger;
+        return AppTheme.plasticColor; // High risk red
       case AlertLevel.warning:
-        return AppConstants.amberWarning;
+        return AppTheme.infectiousColor; // Warning amber
       case AlertLevel.info:
-        return AppConstants.tealAccent;
+        return AppTheme.accentTeal; // Info teal
     }
   }
 

@@ -110,8 +110,11 @@ class SimulatedMqttService implements MqttService {
     // In simulated mode, topics are automatically routed
   }
 
+  static bool enablePeriodicTimer = true;
+
   void _startSimulatedTelemetryStream() {
     _telemetryTicker?.cancel();
+    if (!enablePeriodicTimer) return;
     _telemetryTicker = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (_currentState != MqttConnectionState.connected) return;
 

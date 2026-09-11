@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
-import '../models/user_model.dart';
-import '../services/mock_database_service.dart';
+import '../models/app_user_model.dart';
+import '../services/api_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  UserModel? _currentUser;
+  AppUserModel? _currentUser;
   bool _isAuthenticated = false;
   bool _isLoading = false;
   String? _error;
 
-  final MockDatabaseService _dbService = MockDatabaseService();
+  final ApiService _apiService = ApiService();
 
-  UserModel? get currentUser => _currentUser;
+  AppUserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _isAuthenticated;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> login(String email, String password) async {
+  bool get isAdmin => _currentUser?.isAdmin ?? false;
+  bool get isStaff => _currentUser?.isStaff ?? false;
+  String? get jwtToken => _currentUser?.token;
+
+  Future<void> login(String identifier, String password) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final user = await _dbService.loginWithEmailPassword(email, password);
-      if (user != null) {
-        _currentUser = user;
-        _isAuthenticated = true;
-      }
+      final user = await _apiService.login(
+        identifier: identifier,
+        password: password,
+      );
+      _currentUser = user;
+      _isAuthenticated = true;
     } catch (e) {
       _error = e.toString().replaceAll('Exception: ', '');
     } finally {
@@ -35,8 +40,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void logout() {
+    _apiService.logout();
     _isAuthenticated = false;
     _currentUser = null;
+    _error = null;
     notifyListeners();
   }
 }
