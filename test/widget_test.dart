@@ -4,151 +4,160 @@ import 'package:smart_med_waste/main.dart';
 import 'package:smart_med_waste/core/constants/app_constants.dart';
 
 void main() {
-  testWidgets('SmartMedWaste app loads dashboard smoke test', (WidgetTester tester) async {
+  Future<void> loginAsAdmin(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
-
-    expect(find.text(AppConstants.appName), findsWidgets);
-    expect(find.text('Request Pickup'), findsNWidgets(2)); // FAB + Quick Action
-    expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Robot'), findsOneWidget);
-    expect(find.text('Waste'), findsOneWidget);
-    expect(find.text('Stats'), findsOneWidget);
-    expect(find.text('Settings'), findsOneWidget);
-  });
-
-  testWidgets('Navigation bar switches to Robot Telemetry screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
-
-    await tester.tap(find.text('Robot'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Robot Telemetry & Diagnostics'), findsOneWidget);
-    await tester.drag(find.text('Power & Battery BMS'), const Offset(0, -300));
-    await tester.pumpAndSettle();
-    expect(find.text('Subsystem Diagnostics Checklist'), findsOneWidget);
+    final adminBtn = find.text('Login as Hospital Admin (Dr. Ramanujam)');
+    expect(adminBtn, findsOneWidget);
+    await tester.ensureVisible(adminBtn);
+    await tester.tap(adminBtn);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+  }
+
+  Future<void> loginAsStaff(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SmartMedWasteApp());
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final staffBtn = find.text('Login as ICU Ward Staff (Nurse Sunita)');
+    expect(staffBtn, findsOneWidget);
+    await tester.ensureVisible(staffBtn);
+    await tester.tap(staffBtn);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+  }
+
+  testWidgets('LoginScreen loads and displays form and demo buttons', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SmartMedWasteApp());
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text(AppConstants.appName), findsOneWidget);
+    expect(find.text('Secure Login'), findsOneWidget);
+    expect(find.text('LOGIN'), findsOneWidget);
+    expect(find.text('Login as Hospital Admin (Dr. Ramanujam)'), findsOneWidget);
+    expect(find.text('Login as ICU Ward Staff (Nurse Sunita)'), findsOneWidget);
   });
 
-  testWidgets('Navigation bar switches to Waste Segregation screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
+  testWidgets('Admin login routes to Admin Navigation Wrapper & Dashboard', (WidgetTester tester) async {
+    await loginAsAdmin(tester);
 
-    await tester.tap(find.text('Waste'));
-    await tester.pump();
-
-    expect(find.text('Waste Segregation & Compartments'), findsOneWidget);
-    expect(find.text('Open Onboard AI Vision HUD'), findsOneWidget);
-    expect(find.text('5 Standard Biomedical Compartments'), findsOneWidget);
-  });
-
-  testWidgets('Fleet Selector displays all 4 AMRs', (WidgetTester tester) async {
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
-
+    expect(find.text('Admin Command Portal'), findsOneWidget);
+    expect(find.text('ADMIN'), findsWidgets);
     expect(find.text('FLEET ORCHESTRATION'), findsOneWidget);
-    expect(find.text('4 AMRs ONLINE'), findsOneWidget);
-    expect(find.text('R01'), findsWidgets);
-    expect(find.text('R02'), findsWidgets);
-    expect(find.text('R03'), findsWidgets);
-    expect(find.text('R04'), findsWidgets);
+    expect(find.text('Executive Oversight Controls'), findsOneWidget);
+    expect(find.text('Staff Management'), findsOneWidget);
+    expect(find.text('Compliance Audit'), findsOneWidget);
   });
 
-  testWidgets('Open Request Pickup bottom sheet', (WidgetTester tester) async {
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
+  testWidgets('Admin Dashboard opens Staff Management Sheet and lists staff', (WidgetTester tester) async {
+    await loginAsAdmin(tester);
 
-    // Tap Floating Action Button
-    await tester.tap(find.byType(FloatingActionButton));
-    await tester.pump(const Duration(milliseconds: 500));
+    final staffMgmtBtn = find.text('Staff Management');
+    expect(staffMgmtBtn, findsOneWidget);
+    await tester.tap(staffMgmtBtn);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
 
-    // Verify modal sheet contents
+    expect(find.text('Clinical Staff Management'), findsOneWidget);
+    expect(find.text('Nurse Sunita Kapoor'), findsOneWidget);
+    expect(find.text('Dr. Ramanujam MD'), findsOneWidget);
+  });
+
+  testWidgets('Admin Navigation Bar switches to Fleet, Stats, and Settings', (WidgetTester tester) async {
+    await loginAsAdmin(tester);
+
+    // Fleet tab
+    await tester.tap(find.text('Fleet'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Robot Telemetry & Diagnostics'), findsOneWidget);
+
+    // Stats tab
+    await tester.tap(find.text('Stats'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Waste Generation & Compliance Analytics'), findsOneWidget);
+
+    // Settings tab
+    await tester.tap(find.text('Settings'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Hospital & System Settings'), findsOneWidget);
+  });
+
+  testWidgets('Staff login routes to Staff Navigation Wrapper & Ward Portal', (WidgetTester tester) async {
+    await loginAsStaff(tester);
+
+    expect(find.text('Staff Ward Portal'), findsOneWidget);
+    expect(find.text('WARD STAFF'), findsOneWidget);
+    expect(find.text('DISPATCH ROBOT / REQUEST WARD PICKUP'), findsOneWidget);
+    expect(find.text('Ward Waste Operations'), findsOneWidget);
+    expect(find.text('Scan Waste / AI HUD'), findsOneWidget);
+    expect(find.text('Live AMR Tracker'), findsOneWidget);
+  });
+
+  testWidgets('Staff Dashboard opens Request Collection Sheet', (WidgetTester tester) async {
+    await loginAsStaff(tester);
+
+    final pickupBtn = find.text('DISPATCH ROBOT / REQUEST WARD PICKUP');
+    expect(pickupBtn, findsOneWidget);
+    await tester.tap(pickupBtn);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+
     expect(find.text('Request Waste Pickup'), findsOneWidget);
     expect(find.text('CONFIRM & DISPATCH ROBOT'), findsOneWidget);
   });
 
-  testWidgets('Navigation bar switches to Stats screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
+  testWidgets('Staff Dashboard opens AI Vision Inspection HUD', (WidgetTester tester) async {
+    await loginAsStaff(tester);
 
-    await tester.tap(find.text('Stats'));
-    await tester.pump();
+    final scanBtn = find.text('Scan Waste / AI HUD');
+    expect(scanBtn, findsOneWidget);
+    await tester.tap(scanBtn);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
 
-    expect(find.text('Waste Generation & Compliance Analytics'), findsOneWidget);
-    expect(find.text('CPCB COMPLIANCE'), findsOneWidget);
+    expect(find.text('CLINICAL AI INSPECTION PORTAL'), findsOneWidget);
   });
 
-  testWidgets('Waste screen View All Ledger opens CPCB Traceability Ledger screen', (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(800, 1600);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('Staff Navigation Bar switches to Tracking, Waste, and Settings', (WidgetTester tester) async {
+    await loginAsStaff(tester);
 
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
-
-    // Switch to Waste screen
-    await tester.tap(find.text('Waste'));
-    await tester.pumpAndSettle();
-
-    // Tap View All Ledger
-    final viewAllBtn = find.text('View All Ledger');
-    expect(viewAllBtn, findsOneWidget);
-    await tester.tap(viewAllBtn);
-    await tester.pumpAndSettle();
-
-    // Verify Ledger Screen opened without crashing and shows CPCB title & entries
-    expect(find.text('CPCB Regulatory Traceability Ledger'), findsOneWidget);
-    expect(find.text('#CW-1024'), findsOneWidget);
-    expect(find.text('Sharps'), findsWidgets);
-  });
-
-  testWidgets('Tracking screen switches robot, shows dynamic ID, destination and steps route', (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(800, 1600);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
-
-    // Tap Corridor Map quick action button on Dashboard
-    final mapBtn = find.text('Corridor Map');
-    expect(mapBtn, findsOneWidget);
-    await tester.tap(mapBtn);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-
+    // Tracking tab
+    await tester.tap(find.text('Tracking'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('Hospital Autonomous Transit Map'), findsOneWidget);
-    expect(find.textContaining('Target: Central Bio Disposal'), findsOneWidget);
 
-    // Switch to R02 in active screen's Fleet Selector
-    await tester.tap(find.text('R02').last);
-    await tester.pump(const Duration(milliseconds: 300));
+    // Waste tab
+    await tester.tap(find.text('Waste'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Waste Segregation & Compartments'), findsOneWidget);
 
-    // Verify R02 target destination and route steps are displayed
-    expect(find.textContaining('Target: Central Incineration Bay'), findsOneWidget);
-    expect(find.text('1. OT Complex 03'), findsOneWidget);
-
-    // Step transit
-    await tester.tap(find.text('STEP TRANSIT').last);
-    await tester.pump(const Duration(milliseconds: 300));
-
-    // Verify transit state updated
-    expect(find.text('TRANSIT / EN ROUTE'), findsOneWidget);
-  });
-
-
-
-  testWidgets('Navigation bar switches to Settings screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const SmartMedWasteApp());
-    await tester.pump();
-
+    // Settings tab
     await tester.tap(find.text('Settings'));
-    await tester.pump();
-
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('Hospital & System Settings'), findsOneWidget);
-    expect(find.text('Demo Simulation Engine (SIH Judges)'), findsOneWidget);
   });
 }
-

@@ -1,53 +1,37 @@
 import 'package:flutter/material.dart';
-
-class StaffUser {
-  final String staffId;
-  final String fullName;
-  final String role;
-  final String assignedWard;
-  final String hospitalName;
-
-  const StaffUser({
-    required this.staffId,
-    required this.fullName,
-    required this.role,
-    required this.assignedWard,
-    required this.hospitalName,
-  });
-}
+import '../models/user_model.dart';
+import '../services/mock_database_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  StaffUser? _currentUser;
-  bool _isAuthenticated = true; // Auto-authenticated in demo mode for instant judging
+  UserModel? _currentUser;
+  bool _isAuthenticated = false;
+  bool _isLoading = false;
+  String? _error;
 
-  AuthProvider() {
-    _currentUser = const StaffUser(
-      staffId: 'STF-4428',
-      fullName: 'Nurse Sunita Kapoor',
-      role: 'ICU Ward Staff Incharge',
-      assignedWard: 'ICU - Floor 2',
-      hospitalName: 'Apollo Apex Multispecialty Hospital',
-    );
-  }
+  final MockDatabaseService _dbService = MockDatabaseService();
 
-  StaffUser? get currentUser => _currentUser;
+  UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _isAuthenticated;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
-  void loginAsRole({
-    required String staffId,
-    required String name,
-    required String role,
-    required String ward,
-  }) {
-    _currentUser = StaffUser(
-      staffId: staffId,
-      fullName: name,
-      role: role,
-      assignedWard: ward,
-      hospitalName: 'Apollo Apex Multispecialty Hospital',
-    );
-    _isAuthenticated = true;
+  Future<void> login(String email, String password) async {
+    _isLoading = true;
+    _error = null;
     notifyListeners();
+
+    try {
+      final user = await _dbService.loginWithEmailPassword(email, password);
+      if (user != null) {
+        _currentUser = user;
+        _isAuthenticated = true;
+      }
+    } catch (e) {
+      _error = e.toString().replaceAll('Exception: ', '');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void logout() {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../constants/app_constants.dart';
 
 /// Modern Nordic Health-Tech Palette & Material 3 Theme System
 /// Sage, Muted Slate & Soft Frost clinical design system

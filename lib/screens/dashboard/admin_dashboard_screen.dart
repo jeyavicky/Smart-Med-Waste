@@ -3,27 +3,31 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/mission_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/mission_provider.dart';
 import '../../providers/robot_provider.dart';
 import '../../providers/waste_analytics_provider.dart';
 import '../../widgets/compartment_bar_widget.dart';
-import '../../widgets/robot_status_card.dart';
 import '../../widgets/robot_fleet_selector.dart';
+import '../../widgets/robot_status_card.dart';
 import '../alerts/alerts_screen.dart';
-import '../collection/request_collection_sheet.dart';
+import '../analytics/analytics_screen.dart';
+import '../history/history_screen.dart';
 import '../tracking/tracking_screen.dart';
 import '../waste/ai_detection_screen.dart';
-import '../history/history_screen.dart';
+import 'staff_management_sheet.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+class AdminDashboardScreen extends StatelessWidget {
+  const AdminDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
     final robotProvider = context.watch<RobotProvider>();
     final missionProvider = context.watch<MissionProvider>();
     final wasteProvider = context.watch<WasteAnalyticsProvider>();
 
+    final user = authProvider.currentUser;
     final robot = robotProvider.robot;
     final activeMission = missionProvider.activeMission;
 
@@ -37,11 +41,10 @@ class DashboardScreen extends StatelessWidget {
             Row(
               children: [
                 const Text(
-                  AppConstants.appName,
+                  'Admin Command Portal',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: 18,
-                    letterSpacing: -0.3,
+                    fontSize: 17,
                     color: AppConstants.clinicalNavy,
                   ),
                 ),
@@ -49,33 +52,32 @@ class DashboardScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: AppConstants.clinicalNavy.withOpacity(0.08),
+                    color: AppConstants.statusNominal.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: AppConstants.clinicalNavy.withOpacity(0.2)),
                   ),
-                  child: Text(
-                    robot.id,
-                    style: const TextStyle(
+                  child: const Text(
+                    'ADMIN',
+                    style: TextStyle(
                       fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: AppConstants.clinicalNavy,
+                      fontWeight: FontWeight.w800,
+                      color: AppConstants.statusNominal,
                     ),
                   ),
                 ),
               ],
             ),
-            Text(
-              'Apollo Apex Hospital • Infection Control Logistics',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppConstants.textSecondary,
-                fontWeight: FontWeight.w400,
+            if (user != null)
+              Text(
+                '${user.department} • ${user.name}',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppConstants.textSecondary,
+                ),
               ),
-            ),
           ],
         ),
         actions: [
-          // Alerts Bell with Badge
+          // Alerts Bell with Real-time Unread Badge
           Stack(
             children: [
               IconButton(
@@ -146,12 +148,95 @@ class DashboardScreen extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
 
-            // Quick Actions Shortcut Bar
-            _buildQuickActionButtons(context),
+            // Admin Executive Quick Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text(
+                  'Executive Oversight Controls',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: AppConstants.clinicalNavy,
+                  ),
+                ),
+                Text(
+                  'SIH Problem PS 26115',
+                  style: TextStyle(fontSize: 10, color: AppConstants.textSecondary),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
 
-            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildActionCard(
+                    context,
+                    icon: Icons.people_alt_outlined,
+                    title: 'Staff Management',
+                    subtitle: 'Ward duty & access control',
+                    badge: '4 ACTIVE',
+                    badgeColor: AppConstants.statusNominal,
+                    onTap: () => StaffManagementSheet.show(context),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildActionCard(
+                    context,
+                    icon: Icons.verified_user_outlined,
+                    title: 'Compliance Audit',
+                    subtitle: 'CPCB 2016 verified ledger',
+                    badge: '98.6%',
+                    badgeColor: AppConstants.medicalTeal,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const HistoryScreen()),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _buildActionCard(
+                    context,
+                    icon: Icons.camera_alt_outlined,
+                    title: 'Chamber AI HUD',
+                    subtitle: '45 FPS optical edge vision',
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const AiDetectionScreen()),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildActionCard(
+                    context,
+                    icon: Icons.map_outlined,
+                    title: 'Autonomous Map',
+                    subtitle: 'SLAM corridor navigation',
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const TrackingScreen()),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
 
             // Today's Waste Collection Metric Summary Card
             _buildMetricSummaryCard(context, wasteProvider),
@@ -201,7 +286,7 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // The 5 Compartments of the active AMR
+            // The 5 Compartments of the active AMR with interactive inspection tap
             ...robot.compartments.values.map(
               (comp) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
@@ -223,73 +308,133 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildActionCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    String? badge,
+    Color? badgeColor,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppConstants.cardBg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppConstants.cardBorder, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppConstants.clinicalNavy.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: AppConstants.clinicalNavy, size: 20),
+                ),
+                if (badge != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: (badgeColor ?? AppConstants.statusNominal).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      badge,
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: badgeColor ?? AppConstants.statusNominal,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: AppConstants.clinicalNavy,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppConstants.textSecondary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildActiveMissionBanner(
     BuildContext context,
     MissionModel mission,
     RobotProvider robotProvider,
   ) {
-    final isEmergency = mission.priority == MissionPriority.emergencyBiologicalSpill;
-    final color = isEmergency ? AppConstants.crimsonDanger : AppConstants.medicalTeal;
+    final robot = robotProvider.robot;
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isEmergency ? AppConstants.crimsonDangerLight : AppConstants.surfacePorcelain,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color,
-          width: 1.2,
-        ),
+        color: AppConstants.clinicalNavy,
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.14),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              mission.status == MissionStatus.collecting
-                  ? Icons.scanner_rounded
-                  : Icons.near_me_rounded,
-              color: color,
-              size: 18,
+          const SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'ACTIVE: ${mission.status.displayName}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 11,
-                        color: color,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '#${mission.missionId}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppConstants.textSecondary,
-                      ),
-                    ),
-                  ],
+                Text(
+                  'MISSION IN PROGRESS • ${robot.id}',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${mission.department} • Target: ${mission.stationId}',
+                  '${mission.department} (${mission.stationId})',
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppConstants.clinicalNavy,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
                   ),
                 ),
               ],
@@ -301,111 +446,9 @@ class DashboardScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const TrackingScreen()),
               );
             },
-            child: const Text('TRACK', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11)),
+            child: const Text('TRACK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11)),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionButtons(BuildContext context) {
-    return Row(
-      children: [
-        // Camera View HUD Shortcut
-        Expanded(
-          child: _quickActionButton(
-            context,
-            icon: Icons.camera_alt_outlined,
-            label: 'AI Inspection HUD',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AiDetectionScreen()),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 10),
-
-        // Autonomous Map Shortcut
-        Expanded(
-          child: _quickActionButton(
-            context,
-            icon: Icons.map_outlined,
-            label: 'Corridor Map',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const TrackingScreen()),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 10),
-
-        // Request Pickup Shortcut
-        Expanded(
-          child: _quickActionButton(
-            context,
-            icon: Icons.add_circle_outline_rounded,
-            label: 'Request Pickup',
-            isPrimary: true,
-            onTap: () => RequestCollectionSheet.show(context),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _quickActionButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool isPrimary = false,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        height: 52,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: isPrimary ? AppConstants.clinicalNavy : AppConstants.cardBg,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isPrimary ? AppConstants.clinicalNavy : AppConstants.medicalTeal,
-            width: 1.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isPrimary ? Colors.white : AppConstants.clinicalNavy,
-              size: 18,
-            ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 11,
-                  color: isPrimary ? Colors.white : AppConstants.clinicalNavy,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -418,12 +461,12 @@ class DashboardScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppConstants.cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppConstants.cardBorder, width: 1.2),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppConstants.cardBorder, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 6,
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -480,16 +523,24 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppConstants.medicalTeal.withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.auto_graph_rounded,
-                  color: AppConstants.medicalTeal,
-                  size: 22,
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
+                  );
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppConstants.medicalTeal.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.auto_graph_rounded,
+                    color: AppConstants.medicalTeal,
+                    size: 22,
+                  ),
                 ),
               ),
             ],

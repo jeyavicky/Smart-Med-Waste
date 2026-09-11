@@ -76,19 +76,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        authProvider.currentUser?.fullName ?? 'Nurse Sunita Kapoor',
+                        authProvider.currentUser?.name ?? 'Nurse Sunita Kapoor',
                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${authProvider.currentUser?.role} • ${authProvider.currentUser?.staffId}',
+                        '${authProvider.currentUser != null ? authProvider.currentUser!.role.toUpperCase() : "STAFF"} • ${authProvider.currentUser?.uid ?? "STF-01"}',
                         style: TextStyle(
                           fontSize: 12,
                           color: isDark ? AppConstants.lightSlate : AppConstants.neutralGrey,
                         ),
                       ),
                       Text(
-                        authProvider.currentUser?.hospitalName ?? 'Apex Multispecialty',
+                        authProvider.currentUser?.hospitalId ?? 'Apex Multispecialty',
                         style: const TextStyle(fontSize: 11, color: AppConstants.tealAccent),
                       ),
                     ],
@@ -98,8 +98,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   tooltip: 'Switch User / Logout',
                   icon: const Icon(Icons.logout_rounded, color: AppConstants.crimsonDanger),
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(
+                    context.read<AuthProvider>().logout();
+                    Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
                     );
                   },
                 ),

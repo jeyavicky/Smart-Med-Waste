@@ -47,13 +47,16 @@ class _AiDetectionScreenState extends State<AiDetectionScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'CLINICAL AI INSPECTION PORTAL',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.6,
-                color: AppConstants.clinicalNavy,
+            const Flexible(
+              child: Text(
+                'CLINICAL AI INSPECTION PORTAL',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: AppConstants.clinicalNavy,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
